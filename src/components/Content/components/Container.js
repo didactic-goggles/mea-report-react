@@ -5,8 +5,8 @@ import {
 } from "react-router-dom";
 
 import Home from "./Home";
-import Users from "./Users";
-import UserDetails from "./UserDetails";
+import Users from "./Users/Users";
+import Payments from "./Payments/Payments";
 
 function Container() {
     console.log('Rendering => Container');
@@ -20,6 +20,9 @@ function Container() {
               </Route> */}
               <Route path="/users">
                 <Users />
+              </Route>
+              <Route path="/payments">
+                <Payments />
               </Route>
               
               <Route path="/">

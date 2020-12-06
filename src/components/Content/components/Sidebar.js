@@ -55,6 +55,12 @@ export default function Sidebar() {
                             <i class="metismenu-icon pe-7s-display2"></i>
                                     Kullanıcı Detayları</NavLink>
                             </li>
+                            <li class="app-sidebar__heading">Ödemeler</li>
+                            <li>
+                            <NavLink to="/payments" activeClassName="mm-active">
+                            <i class="metismenu-icon pe-7s-display2"></i>
+                                    Ödeme Detayları</NavLink>
+                            </li>
                             <li class="app-sidebar__heading">Servisler</li>
                             <li>
                                 <a href="serviceDetails.html">
