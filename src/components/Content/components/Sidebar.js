@@ -1,64 +1,65 @@
 import React from 'react'
 import {NavLink} from "react-router-dom";
-
+import {FaHome, FaUserFriends} from 'react-icons/fa';
+import {MdPayment} from 'react-icons/md';
 
 
 export default function Sidebar() {
     console.log('Rendering => Sidebar');
     return (
-        <div class="app-sidebar sidebar-shadow">
-            <div class="app-header__logo">
-                <div class="logo-src"></div>
-                <div class="header__pane ml-auto">
+        <div className="app-sidebar sidebar-shadow">
+            <div className="app-header__logo">
+                <div className="logo-src"></div>
+                <div className="header__pane ml-auto">
                     <div>
-                        <button type="button" class="hamburger close-sidebar-btn hamburger--elastic"
+                        <button type="button" className="hamburger close-sidebar-btn hamburger--elastic"
                             data-class="closed-sidebar">
-                            <span class="hamburger-box">
-                                <span class="hamburger-inner"></span>
+                            <span className="hamburger-box">
+                                <span className="hamburger-inner"></span>
                             </span>
                         </button>
                     </div>
                 </div>
             </div>
-            <div class="app-header__mobile-menu">
+            <div className="app-header__mobile-menu">
                 <div>
-                    <button type="button" class="hamburger hamburger--elastic mobile-toggle-nav">
-                        <span class="hamburger-box">
-                            <span class="hamburger-inner"></span>
+                    <button type="button" className="hamburger hamburger--elastic mobile-toggle-nav">
+                        <span className="hamburger-box">
+                            <span className="hamburger-inner"></span>
                         </span>
                     </button>
                 </div>
             </div>
-            <div class="app-header__menu">
+            <div className="app-header__menu">
                 <span>
                     <button type="button"
-                        class="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
-                        <span class="btn-icon-wrapper">
-                            <i class="fa fa-ellipsis-v fa-w-6"></i>
+                        className="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
+                        <span className="btn-icon-wrapper">
+                            <i className="fa fa-ellipsis-v fa-w-6"></i>
                         </span>
                     </button>
                 </span>
             </div>
-            <div class="scrollbar-sidebar">
-                <div class="app-sidebar__inner">
-                    <ul class="vertical-nav-menu">
-                        <li class="app-sidebar__heading">Anasayfa</li>
+            <div className="scrollbar-sidebar">
+                <div className="app-sidebar__inner">
+                    <ul className="vertical-nav-menu">
+                        <li className="app-sidebar__heading">Anasayfa</li>
                             <li>
                                 <NavLink to="/" exact activeClassName="mm-active">
-                                    <i class="metismenu-icon pe-7s-rocket"></i>
+                                    <FaHome />
                                     Dashboard</NavLink>
                                
                             </li>
-                            <li class="app-sidebar__heading">Kullanıcılar</li>
+                            <li className="app-sidebar__heading">Kullanıcılar</li>
                             <li>
                             <NavLink to="/users" activeClassName="mm-active">
-                            <i class="metismenu-icon pe-7s-display2"></i>
+                                <FaUserFriends />
                                     Kullanıcı Detayları</NavLink>
                             </li>
-                            <li class="app-sidebar__heading">Ödemeler</li>
+                            <li className="app-sidebar__heading">Ödemeler</li>
                             <li>
                             <NavLink to="/payments" activeClassName="mm-active">
-                            <i class="metismenu-icon pe-7s-display2"></i>
+                                <MdPayment />
                                     Ödeme Detayları</NavLink>
                             </li>
                             {/* <li class="app-sidebar__heading">Servisler</li>
