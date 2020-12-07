@@ -5,28 +5,30 @@ import {useHistory, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { DateRange } from 'react-date-range';
 // import Chart from "react-apexcharts";
-import { Spinner, Badge, Button, OverlayTrigger, Popover } from "react-bootstrap";
+import { Spinner, Badge, Button, OverlayTrigger, Popover, Form } from "react-bootstrap";
 import Axios from "axios";
 import Datatable from "react-data-table-component";
-
+import Card from '../../../UI/Card';
 
 const PaymentDetails = (props) => {
     console.log("Rendering => PaymentDetails");
     let history = useHistory();
     let { selectedPayment } = props;
     let { id } = useParams();
+
     const [userPayments, setUserPayments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [totalPaymentDetails, setTotalPaymentDetails] = useState();
     console.log(selectedPayment);
-    const [state, setState] = useState([
+    const [selectedDate, setSelectedDate] = useState([
         {
           startDate: new Date(),
-          endDate: null,
+          endDate: new Date(),
           key: 'selection'
         }
       ]);
 
-      console.log(state)
+      console.log(selectedDate);
       
 
     const getPayments = async () => {
@@ -46,8 +48,17 @@ const PaymentDetails = (props) => {
         // );
         // console.log(getPaymentsResponse.data);
         const userPaymentsArray = tempPayments.filter(payment => payment.User == selectedPayment.User && payment.Status == 'Completed');
+        const tempTotalPaymentObject = {
+            totalPayment: 0,
+            numberOfPayment: 0
+        }
+        userPaymentsArray.forEach(payment => {
+            tempTotalPaymentObject.totalPayment += Number(payment.Amount);
+            tempTotalPaymentObject.numberOfPayment++;
+        })
         // setLoading(false);
         setUserPayments(userPaymentsArray);
+        setTotalPaymentDetails(tempTotalPaymentObject);
     };
 
     useEffect(() => {
@@ -58,6 +69,34 @@ const PaymentDetails = (props) => {
         };
         getter();
     }, []);
+
+    useEffect(() => {
+        const tempTotalPaymentObject = {
+            totalPayment: 0,
+            numberOfPayment: 0
+        }
+        const tempArray = userPayments.map(payment => {
+            if(moment(payment.Created).isBetween(moment(selectedDate[0].startDate), moment(selectedDate[0].endDate), null, "[]")) {
+                payment.visible = true;
+                tempTotalPaymentObject.totalPayment += Number(payment.Amount);
+                tempTotalPaymentObject.numberOfPayment++;
+            } else
+                payment.visible = false;
+            return payment;
+        })
+        setTotalPaymentDetails(tempTotalPaymentObject);
+        // const filteredPaymentsByDate = userPayments.filter(payment => 
+        //     moment(payment.Created).isBetween(moment(selectedDate[0].startDate), moment(selectedDate[0].endDate), null, "(]")
+        // );
+        // setUserPayments(filteredPaymentsByDate)
+        // console.log(filteredPaymentsByDate);
+        setUserPayments(tempArray)
+    }, [selectedDate])
+
+    const onDateChangeHandler = () => {
+
+    }
+
     const loadingComponent = (
         <div
             className="d-flex align-items-center w-100 justify-content-center mt-auto"
@@ -75,121 +114,34 @@ const PaymentDetails = (props) => {
           <Popover.Content>
             <DateRange
                 editableDateInputs={true}
-                onChange={item => setState([item.selection])}
+                onChange={item => setSelectedDate([item.selection])}
                 moveRangeOnFirstSelection={false}
-                ranges={state}
+                ranges={selectedDate}
             />
           </Popover.Content>
         </Popover>
       );
       
-      const Example = () => (
+      const ToggleCalendar = () => (
         <OverlayTrigger trigger="click" placement="bottom" overlay={popover}>
-          <Button variant="success">Click me to see</Button>
+          <Form.Group controlId="formBasicEmail">
+            <Form.Label>Tarih</Form.Label>
+            <Form.Control 
+                type="text" 
+                placeholder="başl.tar/bit.tar"
+                onChange={() => onDateChangeHandler()}
+                value={`${moment(selectedDate[0].startDate).format('DD-MM')}/${moment(selectedDate[0].endDate).format('DD-MM')} ${moment(selectedDate[0].endDate).format('YYYY')}`}/>
+        </Form.Group>
         </OverlayTrigger>
       );
-    //   const ChartUsages = () => {
-    //     const chartUsagesArray = selectedUser.services.sort((service1, service2) =>
-    //       service1.quantity < service2.quantity ? 1 : -1
-    //     );
 
-    //     var optionsChartUsages = {
-    //       chart: {
-    //         width: "100%",
-    //         type: "donut",
-    //       },
-    //       title: {
-    //         text: "En çok kullandığı servisler",
-    //       },
-    //       labels: chartUsagesArray.slice(0, 5).map((service) => service.name),
-    //       dataLabels: {
-    //         enabled: false,
-    //       },
-    //     //   responsive: [
-    //     //     {
-    //     //       breakpoint: 480,
-    //     //       options: {
-    //     //         chart: {
-    //     //           width: "100%",
-    //     //           height: 350,
-    //     //         },
-    //     //         legend: {
-    //     //           show: false,
-    //     //         },
-    //     //       },
-    //     //     },
-    //     //   ],
-    //       legend: {
-    //         show: false,
-    //         // position: 'right',
-    //         // offsetY: 0,
-    //         // height: 230,
-    //       },
-    //     };
-
-    //     return (
-    //       <Chart
-    //         series={chartUsagesArray.slice(0, 5).map((service) => service.quantity)}
-    //         options={optionsChartUsages}
-    //         type="donut"
-    //       />
-    //     );
-    //   };
-    //   const ChartSpents = () => {
-    //     const chartSpentsArray = selectedUser.services.sort(
-    //       (service1, service2) => (service1.spent < service2.spent ? 1 : -1)
-    //     );
-
-    //     var optionsChartSpents = {
-    //       chart: {
-    //         width: "100%",
-    //         type: "donut",
-    //       },
-    //       title: {
-    //         text: "En çok harcadığı servisler",
-    //       },
-    //       labels: chartSpentsArray.slice(0, 5).map((service) => service.name),
-    //       dataLabels: {
-    //         enabled: false,
-    //       },
-    //     //   responsive: [
-    //     //     {
-    //     //       breakpoint: 480,
-    //     //       options: {
-    //     //         chart: {
-    //     //           width: "100%",
-    //     //           height: 350,
-    //     //         },
-    //     //         legend: {
-    //     //           show: false,
-    //     //         },
-    //     //       },
-    //     //     },
-    //     //   ],
-    //       legend: {
-    //         show: false,
-    //         // position: 'right',
-    //         // offsetY: 0,
-    //         // height: 230,
-    //       },
-    //     };
-
-    //     return (
-    //       <Chart
-    //         series={chartSpentsArray.slice(0, 5).map((service) => service.spent)}
-    //         options={optionsChartSpents}
-    //         type="donut"
-    //       />
-    //     );
-    //   };
+      const Filters = () => 
+          <div>
+                <ToggleCalendar />
+          </div>
 
     const columns = React.useMemo(
         () => [
-            // {
-            //     name: "Servis",
-            //     selector: "name",
-            //     sortable: true,
-            // },
             {
                 name: "Metod",
                 selector: "Method",
@@ -233,18 +185,26 @@ const PaymentDetails = (props) => {
     return (
         <>
         <Button variant="light" onClick={() => history.goBack()}>Geri</Button>
-            {/* <div className="row">
-        <div className="col-lg-6">{ChartSpents()}</div>
-        <div className="col-lg-6">{ChartUsages()}</div>
-      </div> */}
-      <Example />
-          
-            <Datatable
-                title={`${selectedPayment.User} - Diğer Ödemeler`}
-                columns={columns}
-                data={userPayments}
-                pagination
-            />
+        <div class="row mt-3">
+            {totalPaymentDetails.totalPayment ? 
+                <div class="col-md-6 col-xl-4">
+                    <Card variant="bg-midnight-bloom" details={{number: totalPaymentDetails.totalPayment, title: 'Bu dönemki toplam ödeme'}} />
+                </div>
+            : null}
+            {totalPaymentDetails.numberOfPayment ? 
+                <div class="col-md-6 col-xl-4">
+                    <Card variant="bg-arielle-smile" details={{number: totalPaymentDetails.numberOfPayment, title: 'Bu dönemki toplam ödeme sayısı'}} />
+                </div>
+            : null}
+        </div>
+        <Datatable
+            title={`${selectedPayment.User} - Diğer Ödemeler`}
+            columns={columns}
+            data={userPayments.filter(payment => payment.visible !== false)}
+            pagination
+            subHeader
+            subHeaderComponent={<Filters />}
+        />
         </>
     );
 };

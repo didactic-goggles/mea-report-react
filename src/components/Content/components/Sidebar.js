@@ -61,13 +61,13 @@ export default function Sidebar() {
                             <i class="metismenu-icon pe-7s-display2"></i>
                                     Ödeme Detayları</NavLink>
                             </li>
-                            <li class="app-sidebar__heading">Servisler</li>
+                            {/* <li class="app-sidebar__heading">Servisler</li>
                             <li>
                                 <a href="serviceDetails.html">
                                     <i class="metismenu-icon pe-7s-display2"></i>
                                     Servis Detayları
                                 </a>
-                            </li>
+                            </li> */}
                     </ul>
                 </div>
             </div>
