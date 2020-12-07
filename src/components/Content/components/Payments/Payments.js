@@ -12,32 +12,37 @@ const Payments = () => {
     const [payments, setPayments] = useState([]);
     const [selectedPayment, setSelectedPayment] = useState('');
     const getPayments = async () => {
-        const getPaymentsResponse = await Axios.get(
-            "/data/payments/payments.json"
-            );
-            // setLoading(false);
-            setPayments(getPaymentsResponse.data);
-        };
+      const tempPayments = [];
+      // const promiseArray = [];
+      for(let i = 0; i < 7 ; i++) {
+          const getPaymentsResponse = await Axios.get(
+              `/data/payments/payments${i}.json`
+          );
+          tempPayments.push(...getPaymentsResponse.data);
+      }
+      // setLoading(false);
+      setPayments(tempPayments);
+    };
         
-        const columns = React.useMemo(
-            () => [
-                {
-                    name: "Ad",
-                    selector: "User",
-                    sortable: true,
-                },
-                {
-                    name: "Metod",
-                    selector: "Method",
-                    sortable: true,
-                },
-                {
-                    name: "Tutar",
-                    selector: "Amount",
-                    sortable: true,
-                },
-            ]
-        );
+    const columns = React.useMemo(
+        () => [
+            {
+                name: "Ad",
+                selector: "User",
+                sortable: true,
+            },
+            {
+                name: "Metod",
+                selector: "Method",
+                sortable: true,
+            },
+            {
+                name: "Tutar",
+                selector: "Amount",
+                sortable: true,
+            },
+        ]
+    );
     
     useEffect(() => {
         setLoading(true);
@@ -87,7 +92,7 @@ const Payments = () => {
         </div>
       </div>
         </Route>
-        <Route path={`${path}/:ID`}>
+        <Route path={`${path}/:id`}>
             <div class="row">
                 <div class="col-lg-12">
                     <div class="mb-3 card">

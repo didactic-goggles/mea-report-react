@@ -1,21 +1,51 @@
+import 'react-date-range/dist/styles.css'; // main css file
+import 'react-date-range/dist/theme/default.css'; // theme css file
 import React, { useState, useEffect } from "react";
+import {useHistory, useParams } from 'react-router-dom';
 import moment from 'moment';
-import Chart from "react-apexcharts";
-import { Spinner, Badge } from "react-bootstrap";
+import { DateRange } from 'react-date-range';
+// import Chart from "react-apexcharts";
+import { Spinner, Badge, Button, OverlayTrigger, Popover } from "react-bootstrap";
 import Axios from "axios";
 import Datatable from "react-data-table-component";
+
+
 const PaymentDetails = (props) => {
     console.log("Rendering => PaymentDetails");
-    const { selectedPayment } = props;
+    let history = useHistory();
+    let { selectedPayment } = props;
+    let { id } = useParams();
     const [userPayments, setUserPayments] = useState([]);
     const [loading, setLoading] = useState(true);
     console.log(selectedPayment);
+    const [state, setState] = useState([
+        {
+          startDate: new Date(),
+          endDate: null,
+          key: 'selection'
+        }
+      ]);
+
+      console.log(state)
+      
+
     const getPayments = async () => {
-        const getPaymentsResponse = await Axios.get(
-            "/data/payments/payments.json"
-        );
-        console.log(getPaymentsResponse.data);
-        const userPaymentsArray = getPaymentsResponse.data.filter(payment => payment.User == selectedPayment.User);
+        const tempPayments = [];
+        // const promiseArray = [];
+        for(let i = 0; i < 7 ; i++) {
+            const getPaymentsResponse = await Axios.get(
+                `/data/payments/payments${i}.json`
+            );
+            tempPayments.push(...getPaymentsResponse.data);
+        }
+        if(!selectedPayment) {
+            selectedPayment = tempPayments[tempPayments.findIndex(payment => payment.ID == id)];
+        }
+        // const getPaymentsResponse = await Axios.get(
+        //     "/data/payments/payments.json"
+        // );
+        // console.log(getPaymentsResponse.data);
+        const userPaymentsArray = tempPayments.filter(payment => payment.User == selectedPayment.User && payment.Status == 'Completed');
         // setLoading(false);
         setUserPayments(userPaymentsArray);
     };
@@ -39,6 +69,25 @@ const PaymentDetails = (props) => {
             <h3 className="ml-2">Loading</h3>
         </div>
     );
+
+    const popover = (
+        <Popover id="popover-basic">
+          <Popover.Content>
+            <DateRange
+                editableDateInputs={true}
+                onChange={item => setState([item.selection])}
+                moveRangeOnFirstSelection={false}
+                ranges={state}
+            />
+          </Popover.Content>
+        </Popover>
+      );
+      
+      const Example = () => (
+        <OverlayTrigger trigger="click" placement="bottom" overlay={popover}>
+          <Button variant="success">Click me to see</Button>
+        </OverlayTrigger>
+      );
     //   const ChartUsages = () => {
     //     const chartUsagesArray = selectedUser.services.sort((service1, service2) =>
     //       service1.quantity < service2.quantity ? 1 : -1
@@ -183,10 +232,13 @@ const PaymentDetails = (props) => {
       }
     return (
         <>
+        <Button variant="light" onClick={() => history.goBack()}>Geri</Button>
             {/* <div className="row">
         <div className="col-lg-6">{ChartSpents()}</div>
         <div className="col-lg-6">{ChartUsages()}</div>
       </div> */}
+      <Example />
+          
             <Datatable
                 title={`${selectedPayment.User} - Diğer Ödemeler`}
                 columns={columns}

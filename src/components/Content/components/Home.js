@@ -218,7 +218,8 @@ const Home = () => {
                         <div class="card-body">
                             <Datatable title="Movie List"
                                 columns={columns}
-                                data={userSpents}/>
+                                data={userSpents}
+                                pagination/>
                         </div>
                     </div>
                 </div>
