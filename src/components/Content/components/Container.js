@@ -7,7 +7,7 @@ import {
 import Home from "./Home";
 import Users from "./Users/Users";
 import Payments from "./Payments/Payments";
-
+import Services from './Services/Services';
 function Container() {
     console.log('Rendering => Container');
   return (
@@ -24,7 +24,9 @@ function Container() {
               <Route path="/payments">
                 <Payments />
               </Route>
-              
+              <Route path="/services">
+                <Services />
+              </Route>
               <Route path="/">
                 <Home />
               </Route>

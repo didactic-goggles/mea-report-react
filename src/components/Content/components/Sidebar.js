@@ -1,7 +1,7 @@
 import React from 'react'
 import {NavLink} from "react-router-dom";
-import {FaHome, FaUserFriends} from 'react-icons/fa';
-import {MdPayment} from 'react-icons/md';
+import {FaHome, FaUserFriends, FaShareAlt} from 'react-icons/fa';
+import {MdPayment, MdShare} from 'react-icons/md';
 
 
 export default function Sidebar() {
@@ -43,11 +43,11 @@ export default function Sidebar() {
             <div className="scrollbar-sidebar">
                 <div className="app-sidebar__inner">
                     <ul className="vertical-nav-menu">
-                        <li className="app-sidebar__heading">Anasayfa</li>
+                            {/* <li className="app-sidebar__heading">Anasayfa</li> */}
                             <li>
                                 <NavLink to="/" exact activeClassName="mm-active">
                                     <FaHome />
-                                    Dashboard</NavLink>
+                                    Anasayfa</NavLink>
                                
                             </li>
                             <li className="app-sidebar__heading">Kullanıcılar</li>
@@ -62,13 +62,13 @@ export default function Sidebar() {
                                 <MdPayment />
                                     Ödeme Detayları</NavLink>
                             </li>
-                            {/* <li class="app-sidebar__heading">Servisler</li>
+                            <li class="app-sidebar__heading">Servisler</li>
                             <li>
-                                <a href="serviceDetails.html">
-                                    <i class="metismenu-icon pe-7s-display2"></i>
+                                <NavLink to="/services" activeClassName="mm-active">
+                                    <MdShare />
                                     Servis Detayları
-                                </a>
-                            </li> */}
+                                </NavLink>
+                            </li>
                     </ul>
                 </div>
             </div>
