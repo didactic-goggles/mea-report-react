@@ -26,6 +26,7 @@ const ServiceDetails = (props) => {
   const [allUsersOfService, setAllUsersOfService] = useState([]);
   const [loading, setLoading] = useState(true);
   const [serviceDetails, setServiceDetails] = useState();
+  const [filteredAllOrdersOfService, setFilteredAllOrdersOfService] = useState([]);
   console.log(selectedService);
   const [selectedDate, setSelectedDate] = useState([
     {
@@ -51,25 +52,43 @@ const ServiceDetails = (props) => {
           getServideDetails.data.findIndex((service) => service.id == id)
         ];
     }
-
-    console.log(tempOrders);
-    // const getPaymentsResponse = await Axios.get(
-    //     "/data/payments/payments.json"
-    // );
-    // console.log(getPaymentsResponse.data);
-    // aynı id li siparişleri silmek için
     const tempAllOrdersOfService2 = tempOrders.filter((order) => order.service_id == selectedService.id);
     console.log(tempAllOrdersOfService2);
     const tempAllOrdersOfService = tempAllOrdersOfService2.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i);
     setAllOrdersOfService(tempAllOrdersOfService);
 
+    setOrders(tempAllOrdersOfService);
+    // console.log(tempOrders);
+    // const getPaymentsResponse = await Axios.get(
+    //     "/data/payments/payments.json"
+    // );
+    // console.log(getPaymentsResponse.data);
+    // aynı id li siparişleri silmek için
+
+    // const userPaymentsArray = tempPayments.filter(payment => payment.User == selectedPayment.User && payment.Status == 'Completed');
+    // const tempTotalPaymentObject = {
+    //     totalPayment: 0,
+    //     numberOfPayment: 0
+    // }
+    // userPaymentsArray.forEach(payment => {
+    //     tempTotalPaymentObject.totalPayment += Number(payment.Amount);
+    //     tempTotalPaymentObject.numberOfPayment++;
+    // })
+    // setLoading(false);
+    // setUserPayments(userPaymentsArray);
+    // setTotalPaymentDetails(tempTotalPaymentObject);
+  };
+
+  const setOrders = (orders) => {
+    
+    setFilteredAllOrdersOfService(orders);
     let tempUsersOfService = [];
     // console.log(tempAllOrdersOfService);
     const tempServiceDetails = {
         quantity: 0,
         amount: 0
     }
-    tempAllOrdersOfService.forEach(order => {
+    orders.forEach(order => {
         // console.log(order);
         const userOrderIndex = tempUsersOfService.findIndex(user => user.user === order.user);
         tempServiceDetails.quantity += 1;
@@ -87,44 +106,25 @@ const ServiceDetails = (props) => {
     });
     setAllUsersOfService(tempUsersOfService);
     setServiceDetails(tempServiceDetails);
-    // const userPaymentsArray = tempPayments.filter(payment => payment.User == selectedPayment.User && payment.Status == 'Completed');
-    // const tempTotalPaymentObject = {
-    //     totalPayment: 0,
-    //     numberOfPayment: 0
-    // }
-    // userPaymentsArray.forEach(payment => {
-    //     tempTotalPaymentObject.totalPayment += Number(payment.Amount);
-    //     tempTotalPaymentObject.numberOfPayment++;
-    // })
-    // setLoading(false);
-    // setUserPayments(userPaymentsArray);
-    // setTotalPaymentDetails(tempTotalPaymentObject);
-  };
+  }
 
   useEffect(() => {
     setLoading(true);
     const getter = async () => {
       await getOrders();
-
+      initDatatables();
       setLoading(false);
     };
     getter();
   }, []);
 
   useEffect(() => {
-    // const tempTotalPaymentObject = {
-    //     totalPayment: 0,
-    //     numberOfPayment: 0
-    // }
-    // const tempArray = userPayments.map(payment => {
-    //     if(moment(payment.Created).isBetween(moment(selectedDate[0].startDate), moment(selectedDate[0].endDate), null, "[]")) {
-    //         payment.visible = true;
-    //         tempTotalPaymentObject.totalPayment += Number(payment.Amount);
-    //         tempTotalPaymentObject.numberOfPayment++;
-    //     } else
-    //         payment.visible = false;
-    //     return payment;
-    // })
+    const tempArray = allOrdersOfService.filter(order => 
+      moment(order.created).isBetween(moment(selectedDate[0].startDate), moment(selectedDate[0].endDate))
+    )
+    console.log(allOrdersOfService);
+    console.log(tempArray);
+    setOrders(tempArray);
     // setTotalPaymentDetails(tempTotalPaymentObject);
     // // const filteredPaymentsByDate = userPayments.filter(payment =>
     // //     moment(payment.Created).isBetween(moment(selectedDate[0].startDate), moment(selectedDate[0].endDate), null, "(]")
@@ -133,6 +133,10 @@ const ServiceDetails = (props) => {
     // // console.log(filteredPaymentsByDate);
     // setUserPayments(tempArray)
   }, [selectedDate]);
+
+  const initDatatables = () => {
+
+  }
 
   const onDateChangeHandler = () => {};
 
@@ -262,11 +266,12 @@ const ServiceDetails = (props) => {
                 </div>
             : null}
       </div>
+
       <div className="mb-3">
         <Datatable
             title={`${selectedService.id} ID'li Servisin Siparişleri`}
             columns={columnsForOrders}
-            data={allOrdersOfService}
+            data={filteredAllOrdersOfService}
             pagination
             subHeader
             subHeaderComponent={<Filters />}
