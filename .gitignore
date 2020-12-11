@@ -22,7 +22,6 @@ yarn-debug.log*
 .eslintcache
 
 src/*
-public/*
 build/static/css/*.map
 build/static/js/*.map
 static.json
