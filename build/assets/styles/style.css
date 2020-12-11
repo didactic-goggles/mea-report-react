@@ -1,7 +1,0 @@
-.short-text-250 {
-    display: inline-block;
-    max-width: 250px;
-    white-space: nowrap;
-    overflow: hidden !important;
-    text-overflow: ellipsis;
-}
