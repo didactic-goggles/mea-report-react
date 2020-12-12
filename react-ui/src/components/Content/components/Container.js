@@ -9,6 +9,8 @@ import Users from "./Users/Users";
 import Payments from "./Payments/Payments";
 import Services from './Services/Services';
 import Upload from './Upload/Upload';
+import UploadList from './Upload/UploadList';
+
 function Container() {
     console.log('Rendering => Container');
   return (
@@ -30,6 +32,9 @@ function Container() {
               </Route>
               <Route path="/upload">
                 <Upload />
+              </Route>
+              <Route path="/upload-list">
+                <UploadList />
               </Route>
               <Route path="/">
                 <Home />

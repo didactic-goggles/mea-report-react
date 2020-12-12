@@ -1,9 +1,9 @@
 import React from 'react'
 import {NavLink} from "react-router-dom";
-import {FaHome, FaUserFriends, FaShareAlt} from 'react-icons/fa';
+import {FaHome, FaUserFriends} from 'react-icons/fa';
 import {MdPayment, MdShare} from 'react-icons/md';
-
-
+import {AiOutlineCloudUpload} from 'react-icons/ai';
+import {GiFiles} from 'react-icons/gi';
 export default function Sidebar() {
     console.log('Rendering => Sidebar');
     return (
@@ -72,8 +72,14 @@ export default function Sidebar() {
                             <li class="app-sidebar__heading">Sistem</li>
                             <li>
                                 <NavLink to="/upload" activeClassName="mm-active">
-                                    <MdShare />
+                                    <AiOutlineCloudUpload />
                                     Dosya Yükle
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/upload-list" activeClassName="mm-active">
+                                    <GiFiles />
+                                    Dosya Geçmişi
                                 </NavLink>
                             </li>
                     </ul>

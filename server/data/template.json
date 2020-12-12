@@ -2,5 +2,6 @@
     "orders": [],
     "payments": [],
     "users": [],
-    "services": []
+    "services": [],
+    "files": []
 }
