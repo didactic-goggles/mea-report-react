@@ -6,22 +6,17 @@ import Axios from "axios";
 import PaymentDetails from "./PaymentDetails";
 
 const Payments = () => {
+    console.log("Rendering => Payments");
     let history = useHistory();
     let { path, url } = useRouteMatch();
     const [loading, setLoading] = useState(true);
     const [payments, setPayments] = useState([]);
     const [selectedPayment, setSelectedPayment] = useState('');
     const getPayments = async () => {
-      const tempPayments = [];
-      // const promiseArray = [];
-      for(let i = 0; i < 7 ; i++) {
-          const getPaymentsResponse = await Axios.get(
-              `/data/payments/payments${i}.json`
-          );
-          tempPayments.push(...getPaymentsResponse.data);
-      }
-      // setLoading(false);
-      setPayments(tempPayments);
+      const getPaymentsResponse = await Axios.get(
+        `/db/payments`
+    );
+      setPayments(getPaymentsResponse.data);
     };
         
     const columns = React.useMemo(

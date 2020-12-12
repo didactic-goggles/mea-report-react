@@ -8,6 +8,7 @@ import Home from "./Home";
 import Users from "./Users/Users";
 import Payments from "./Payments/Payments";
 import Services from './Services/Services';
+import Upload from './Upload/Upload';
 function Container() {
     console.log('Rendering => Container');
   return (
@@ -26,6 +27,9 @@ function Container() {
               </Route>
               <Route path="/services">
                 <Services />
+              </Route>
+              <Route path="/upload">
+                <Upload />
               </Route>
               <Route path="/">
                 <Home />

@@ -69,6 +69,13 @@ export default function Sidebar() {
                                     Servis Detayları
                                 </NavLink>
                             </li>
+                            <li class="app-sidebar__heading">Sistem</li>
+                            <li>
+                                <NavLink to="/upload" activeClassName="mm-active">
+                                    <MdShare />
+                                    Dosya Yükle
+                                </NavLink>
+                            </li>
                     </ul>
                 </div>
             </div>

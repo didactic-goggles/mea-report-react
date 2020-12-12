@@ -35,30 +35,39 @@ const PaymentDetails = (props) => {
     const getPayments = async () => {
         const tempPayments = [];
         // const promiseArray = [];
-        for(let i = 0; i < 7 ; i++) {
-            const getPaymentsResponse = await Axios.get(
-                `/data/payments/payments${i}.json`
-            );
-            tempPayments.push(...getPaymentsResponse.data);
-        }
+        // for(let i = 0; i < 7 ; i++) {
+        //     const getPaymentsResponse = await Axios.get(
+        //         `/data/payments/payments${i}.json`
+        //     );
+        //     tempPayments.push(...getPaymentsResponse.data);
+        // }
+        
         if(!selectedPayment) {
-            selectedPayment = tempPayments[tempPayments.findIndex(payment => payment.ID == id)];
+            const getSelectedPaymentResponse = await Axios.get(
+                `/db/payments/${id}`
+            );
+            selectedPayment = getSelectedPaymentResponse.data;
         }
+
+        const getPaymentsResponse = await Axios.get(
+            `/db/payments?User=${selectedPayment.User}&Status=Completed`
+        );
+        tempPayments.push(...getPaymentsResponse.data);
         // const getPaymentsResponse = await Axios.get(
         //     "/data/payments/payments.json"
         // );
         // console.log(getPaymentsResponse.data);
-        const userPaymentsArray = tempPayments.filter(payment => payment.User == selectedPayment.User && payment.Status == 'Completed');
+        // const userPaymentsArray = tempPayments.filter(payment => payment.User == selectedPayment.User && payment.Status == 'Completed');
         const tempTotalPaymentObject = {
             totalPayment: 0,
             numberOfPayment: 0
         }
-        userPaymentsArray.forEach(payment => {
+        tempPayments.forEach(payment => {
             tempTotalPaymentObject.totalPayment += Number(payment.Amount);
             tempTotalPaymentObject.numberOfPayment++;
         })
         // setLoading(false);
-        setUserPayments(userPaymentsArray);
+        setUserPayments(tempPayments);
         setTotalPaymentDetails(tempTotalPaymentObject);
     };
 

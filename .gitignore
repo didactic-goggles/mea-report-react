@@ -10,5 +10,6 @@ npm-debug.log
 # Docker
 Dockerfile
 docker-compose.yml
+react-ui/.eslintcache
 
-New folder
+data

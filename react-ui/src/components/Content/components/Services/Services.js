@@ -13,7 +13,8 @@ const Services = () => {
   const [services, setServices] = useState([]);
   const [selectedService, setSelectedService] = useState("");
   const getServices = async () => {
-    const getServicesResponse = await Axios.get(`/data/services/services.json`);
+    const getServicesResponse = await Axios.get(`/db/services`);
+    console.log(getServicesResponse.data);
     setServices(getServicesResponse.data);
   };
 

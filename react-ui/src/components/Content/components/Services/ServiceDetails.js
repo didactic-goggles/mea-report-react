@@ -41,20 +41,15 @@ const ServiceDetails = (props) => {
   const getOrders = async () => {
     const tempOrders = [];
     // const promiseArray = [];
-    for (let i = 0; i < 4; i++) {
-      const getOrdersResponse = await Axios.get(`/data/orders/order${i}.json`);
-      tempOrders.push(...getOrdersResponse.data);
-    }
+    const getOrdersResponse = await Axios.get(`/db/orders?service_id=${id}`);
+    tempOrders.push(...getOrdersResponse.data);
     if (!selectedService) {
-      const getServideDetails = await Axios.get("/data/services/services.json");
-      selectedService =
-        tempOrders[
-          getServideDetails.data.findIndex((service) => service.id == id)
-        ];
+      const getServideDetails = await Axios.get(`/db/services/${id}`);
+      selectedService = getServideDetails.data;
     }
-    const tempAllOrdersOfService2 = tempOrders.filter((order) => order.service_id == selectedService.id);
-    console.log(tempAllOrdersOfService2);
-    const tempAllOrdersOfService = tempAllOrdersOfService2.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i);
+    // const tempAllOrdersOfService2 = tempOrders.filter((order) => order.service_id == selectedService.id);
+    // console.log(tempAllOrdersOfService2);
+    const tempAllOrdersOfService = tempOrders.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i);
     setAllOrdersOfService(tempAllOrdersOfService);
 
     setOrders(tempAllOrdersOfService);

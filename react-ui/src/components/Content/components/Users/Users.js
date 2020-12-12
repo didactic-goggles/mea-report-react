@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Spinner, Button } from "react-bootstrap";
 import Datatable from "react-data-table-component";
 import Axios from "axios";
+import moment from 'moment';
 import UserDetails from "./UserDetails";
 const TextField = styled.input`
   height: 32px;
@@ -45,7 +46,7 @@ const Users = () => {
   const [selectedUser, setSelectedUser] = useState('');
   const getUsersSpents = async () => {
     const getUsersSpentsResponse = await Axios.get(
-      "/data/users/userSpents.json"
+      "/db/users"
     );
     console.log(getUsersSpentsResponse.data);
     // setLoading(false);
@@ -56,18 +57,19 @@ const Users = () => {
     () => [
       {
         name: "Ad",
-        selector: "user",
+        selector: "username",
         sortable: true,
       },
       {
-        name: "Harcama",
-        selector: "spent",
+        name: "Bakiye",
+        selector: "balance",
         sortable: true,
       },
       {
-        name: "Harcama",
-        selector: "quantity",
+        name: "Son Giriş",
+        selector: "lastauth",
         sortable: true,
+        cell: row => moment(row.lastauth).format('DD/MM/YYYY')
       },
     ],
     []
@@ -102,7 +104,7 @@ const Users = () => {
   );
   const [filterText, setFilterText] = React.useState('');
   const [resetPaginationToggle, setResetPaginationToggle] = React.useState(false);
-  const filteredItems = userSpents.filter(item => item.user && item.user.toLowerCase().includes(filterText.toLowerCase()));
+  const filteredItems = userSpents.filter(item => item.username && item.username.toLowerCase().includes(filterText.toLowerCase()));
 
   const subHeaderComponentMemo = React.useMemo(() => {
     const handleClear = () => {

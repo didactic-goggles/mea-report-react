@@ -8,7 +8,6 @@ const app = jsonServer.create();
 const middlewares = jsonServer.defaults();
 const fs = require('fs');
 const router = jsonServer.router(path.join(__dirname, '/data/db.json'))
-
 const isDev = process.env.NODE_ENV !== 'production';
 const PORT = process.env.PORT || 5000;
 
@@ -36,21 +35,23 @@ if (!isDev && cluster.isMaster) {
   app.post('/upload', function(req, res) {
     if (!req.files || Object.keys(req.files).length === 0)
       return res.status(400).send('No files were uploaded.');
-  
-    const file = req.files.sampleFile;
+    const file = req.files.file;
     if(file.name.split('.').pop() != 'json')
       return res.status(400).send('This is not a json file');
   
     fs.readFile(__dirname + '/data/db.json', 'utf8', function readFileCallback(err, data) {
-      let fileType = 'orders';
+      let fileType = req.body.fileType;
       if (err)
         return res.status(500).send(err);
       try {
         const db = JSON.parse(data); //now it an object
-        if(fileType == 'orders') {
-          db[fileType].push(...JSON.parse(file.data));
-          db[fileType] = db[fileType].filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i);
-        }
+        // if(fileType == 'orders') {
+        //   db[fileType].push(...JSON.parse(file.data));
+        //   db[fileType] = db[fileType].filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i);
+        // }
+        db[fileType].push(...JSON.parse(file.data));
+        let compareKey = db[fileType].id ? 'id' : 'ID';
+        db[fileType] = db[fileType].filter((v,i,a)=>a.findIndex(t=>(t[compareKey] === v[compareKey]))===i);
         const jsString = JSON.stringify(db);
         fs.writeFile(__dirname + '/data/db.json', jsString, 'utf8', function (err, data) {
           if (err)
@@ -58,6 +59,7 @@ if (!isDev && cluster.isMaster) {
           return res.status(200).send('Successful')
         });
       } catch ( error ) {
+        // console.log(error);
         return res.status(400).send('Invalid json file');
       }
     });
