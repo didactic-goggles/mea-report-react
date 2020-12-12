@@ -16,7 +16,8 @@
   "dependencies": {
     "express": "^4.16.4",
     "express-fileupload": "^1.2.0",
-    "json-server": "^0.16.3"
+    "json-server": "^0.16.3",
+    "nodemon": "^2.0.6"
   },
   "repository": {
     "type": "git",
