@@ -1,23 +1,33 @@
 {
-  "name": "mea-report-react",
-  "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "name": "heroku-cra-node",
+  "version": "3.0.0",
+  "description": "How to use create-react-app with a custom Node API on Heroku",
+  "engines": {
+    "node": "10.x"
+  },
   "scripts": {
-    "start": "node server.js",
-    "build": "cd frontend/ && npm install && npm run build"
+    "start": "node server",
+    "build": "cd react-ui/ && npm install && npm run build"
+  },
+  "cacheDirectories": [
+    "node_modules",
+    "react-ui/node_modules"
+  ],
+  "dependencies": {
+    "express": "^4.16.4",
+    "express-fileupload": "^1.2.0",
+    "json-server": "^0.16.3"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/didactic-goggles/mea-report-react.git"
+    "url": "https://github.com/mars/heroku-cra-node.git"
   },
-  "author": "didactic-goggles",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/didactic-goggles/mea-report-react/issues"
-  },
-  "dependencies": {
-    "express-fileupload": "^1.2.0",
-    "json-server": "^0.16.3"
-  }
+  "keywords": [
+    "node",
+    "heroku",
+    "create-react-app",
+    "react"
+  ],
+  "license": "MIT",
+  "devDependencies": {}
 }
