@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {useRouteMatch, Route, Switch, useHistory} from 'react-router-dom';
-import { Spinner } from "react-bootstrap";
+import { Spinner, Badge, Button, OverlayTrigger, Popover, Form } from "react-bootstrap";
 import Datatable from "react-data-table-component";
+import moment from 'moment';
+import { DateRange } from 'react-date-range';
 import Axios from "axios";
 import PaymentDetails from "./PaymentDetails";
 
@@ -12,6 +14,13 @@ const Payments = () => {
     const [loading, setLoading] = useState(true);
     const [payments, setPayments] = useState([]);
     const [selectedPayment, setSelectedPayment] = useState('');
+    const [selectedDate, setSelectedDate] = useState([
+      {
+        startDate: new Date(),
+        endDate: new Date(),
+        key: 'selection'
+      }
+    ]);
     const getPayments = async () => {
       const getPaymentsResponse = await Axios.get(
         `/db/payments`
@@ -47,6 +56,41 @@ const Payments = () => {
         };
         getter();
     }, []);
+
+    const onDateChangeHandler = () => {
+
+    }
+
+    const popover = (
+      <Popover id="popover-basic">
+        <Popover.Content>
+          <DateRange
+              editableDateInputs={true}
+              onChange={item => setSelectedDate([item.selection])}
+              moveRangeOnFirstSelection={false}
+              ranges={selectedDate}
+          />
+        </Popover.Content>
+      </Popover>
+    );
+    
+    const ToggleCalendar = () => (
+      <OverlayTrigger trigger="click" placement="bottom" overlay={popover}>
+        <Form.Group controlId="formBasicEmail">
+          <Form.Label>Tarih</Form.Label>
+          <Form.Control 
+              type="text" 
+              placeholder="başl.tar/bit.tar"
+              onChange={() => onDateChangeHandler()}
+              value={`${moment(selectedDate[0].startDate).format('DD-MM')}/${moment(selectedDate[0].endDate).format('DD-MM')} ${moment(selectedDate[0].endDate).format('YYYY')}`}/>
+      </Form.Group>
+      </OverlayTrigger>
+    );
+
+    const Filters = () => 
+    <div>
+          <ToggleCalendar />
+    </div>
     
     const loadingComponent = (
         <div
@@ -81,6 +125,8 @@ const Payments = () => {
                     setSelectedPayment(event);
                     history.push(`/payments/${event.ID}`)
                 }}
+                subHeader
+                subHeaderComponent={<Filters />}
               />
             </div>
           </div>

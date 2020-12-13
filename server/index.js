@@ -52,6 +52,13 @@ if (!isDev && cluster.isMaster) {
         db[fileType].push(...JSON.parse(file.data));
         let compareKey = 'id' in db[fileType][0] ? 'id' : 'ID';
         db[fileType] = db[fileType].filter((v,i,a)=>a.findIndex(t=>(t[compareKey] === v[compareKey]))===i);
+        db.files.push({
+          name: file.name,
+          ext: file.name.split('.').pop(),
+          fileType: fileType,
+          created: new Date,
+          size: file.size
+        });
         const jsString = JSON.stringify(db);
         fs.writeFile(__dirname + '/data/db.json', jsString, 'utf8', function (err, data) {
           if (err)

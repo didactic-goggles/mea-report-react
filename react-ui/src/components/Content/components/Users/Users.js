@@ -130,7 +130,7 @@ const Users = () => {
               <div class="mb-3 card">
                 <div class="card-body">
                   <Datatable
-                    title="En çok harcama yapan kullanıcılar"
+                    title="Kullanıcılar"
                     columns={columns}
                     data={filteredItems}
                     pagination
@@ -138,7 +138,7 @@ const Users = () => {
                     subHeaderComponent={subHeaderComponentMemo}
                     onRowClicked={(event) => {
                       setSelectedUser(event);
-                      history.push("/users/asd")
+                      history.push(`users/${event.id}`)
                     }}
                   />
                 </div>
@@ -146,7 +146,7 @@ const Users = () => {
             </div>
           </div>
         </Route>
-        <Route path={`${path}/:userId`}>
+        <Route path={`${path}/:id`}>
           <div class="row">
             <div class="col-lg-12">
               <div class="mb-3 card">

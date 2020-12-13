@@ -2,8 +2,9 @@ import React from 'react'
 import {NavLink} from "react-router-dom";
 import {FaHome, FaUserFriends} from 'react-icons/fa';
 import {MdPayment, MdShare} from 'react-icons/md';
-import {AiOutlineCloudUpload} from 'react-icons/ai';
-import {GiFiles} from 'react-icons/gi';
+import {AiOutlineCloudUpload, AiOutlineFolderOpen} from 'react-icons/ai';
+
+
 export default function Sidebar() {
     console.log('Rendering => Sidebar');
     return (
@@ -77,8 +78,8 @@ export default function Sidebar() {
                                 </NavLink>
                             </li>
                             <li>
-                                <NavLink to="/upload-list" activeClassName="mm-active">
-                                    <GiFiles />
+                                <NavLink to="/files" activeClassName="mm-active">
+                                    <AiOutlineFolderOpen />
                                     Dosya Geçmişi
                                 </NavLink>
                             </li>

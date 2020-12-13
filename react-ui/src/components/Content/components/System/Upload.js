@@ -46,7 +46,13 @@ const Upload = () => {
     console.log(event.target.files);
   };
 
-  const FileProgress = () => <ProgressBar now={fileUploadProgress} label={`${fileUploadProgress}%`}/>
+  const FileProgress = () => {
+    return <>
+      <ProgressBar now={fileUploadProgress} label={`${fileUploadProgress}%`}/>
+      {fileUploadProgress == 100 ? <h5 className="text-center my-3">Dosya karşıya yüklendi. Kontrol ediliyor...</h5> : ""}
+    </>
+    
+  }
   return (
     <Row className="justify-content-center">
       <Col sm={12} lg={8}>
