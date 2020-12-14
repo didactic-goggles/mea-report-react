@@ -30,6 +30,7 @@ const Upload = () => {
     }
 
     setIsFileUploading(false);
+    setFileUplaodProgress(0);
   };
 
   const onFileChange = (event) => {

@@ -216,10 +216,10 @@ const Home = () => {
                             </div>
                         </div>
                         <div class="card-body">
-                            <Datatable title="Movie List"
+                            {/* <Datatable title="Movie List"
                                 columns={columns}
                                 data={userSpents}
-                                pagination/>
+                                pagination/> */}
                         </div>
                     </div>
                 </div>

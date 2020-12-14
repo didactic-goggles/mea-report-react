@@ -1,5 +1,8 @@
+import 'rsuite/dist/styles/rsuite-default.css';
+import './custom-theme.less'; // Style customization.
 import Header from './components/Header/Header';
 import Content from './components/Content/Content';
+
 function App() {
   console.log('Rendering => App');
   return (

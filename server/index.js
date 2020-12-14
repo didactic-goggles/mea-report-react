@@ -1,15 +1,17 @@
+const moment = require('moment');
 const express = require('express');
 const path = require('path');
 const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 const fileUpload = require('express-fileupload');
 const jsonServer = require('json-server');
-const app = jsonServer.create();
+
 const middlewares = jsonServer.defaults();
 const fs = require('fs');
 const router = jsonServer.router(path.join(__dirname, '/data/db.json'))
 const isDev = process.env.NODE_ENV !== 'production';
 const PORT = process.env.PORT || 5000;
+
 
 // Multi-process to utilize all CPU cores.
 if (!isDev && cluster.isMaster) {
@@ -49,7 +51,14 @@ if (!isDev && cluster.isMaster) {
         //   db[fileType].push(...JSON.parse(file.data));
         //   db[fileType] = db[fileType].filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i);
         // }
-        db[fileType].push(...JSON.parse(file.data));
+        const uploadedJSON = JSON.parse(file.data);
+        if(fileType == 'orders' || fileType == 'payments') {
+          uploadedJSON.forEach(item => {
+            let compareDate = 'created' in uploadedJSON[0] ? 'created' : 'Created';
+            item[compareDate] = moment(item[compareDate]).unix();
+          })
+        }
+        db[fileType].push(...uploadedJSON);
         let compareKey = 'id' in db[fileType][0] ? 'id' : 'ID';
         db[fileType] = db[fileType].filter((v,i,a)=>a.findIndex(t=>(t[compareKey] === v[compareKey]))===i);
         db.files.push({

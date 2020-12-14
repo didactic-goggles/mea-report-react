@@ -30,7 +30,7 @@ const Services = () => {
       selector: "name",
       sortable: true,
       cell: row => {
-      return <div>{row.name}</div>
+      return <div data-tag="allowRowEvents">{row.name}</div>
       }
     },
     {
