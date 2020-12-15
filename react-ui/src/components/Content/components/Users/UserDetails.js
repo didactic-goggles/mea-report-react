@@ -68,7 +68,8 @@ const UserDetails = (props) => {
 }, []);
   const ChartUsages = () => {
     try {
-      
+      if(!selectedUserDetails.services.length) return;
+
       const chartUsagesArray = selectedUserDetails.services.sort((service1, service2) =>
         service1.quantity < service2.quantity ? 1 : -1
       );
@@ -122,6 +123,7 @@ const UserDetails = (props) => {
   };
   const ChartSpents = () => {
     try {
+      if(!selectedUserDetails.services.length) return;
       
       const chartSpentsArray = selectedUserDetails.services.sort(
         (service1, service2) => (service1.spent < service2.spent ? 1 : -1)

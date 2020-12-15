@@ -5,7 +5,3 @@
     overflow: hidden !important;
     text-overflow: ellipsis;
 }
-
-.rs-picker-menu {
-    z-index: 17 !important;
-}

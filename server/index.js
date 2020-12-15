@@ -59,8 +59,8 @@ if (!isDev && cluster.isMaster) {
           })
         }
         db[fileType].push(...uploadedJSON);
-        let compareKey = 'id' in db[fileType][0] ? 'id' : 'ID';
-        db[fileType] = db[fileType].filter((v,i,a)=>a.findIndex(t=>(t[compareKey] === v[compareKey]))===i);
+        // let compareKey = 'id' in db[fileType][0] ? 'id' : 'ID';
+        // db[fileType] = db[fileType].filter((v,i,a)=>a.findIndex(t=>(t[compareKey] === v[compareKey]))===i);
         db.files.push({
           name: file.name,
           ext: file.name.split('.').pop(),

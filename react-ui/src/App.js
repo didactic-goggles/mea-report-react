@@ -1,5 +1,5 @@
-import 'rsuite/dist/styles/rsuite-default.css';
-import './custom-theme.less'; // Style customization.
+import 'rsuite/lib/styles/index.less';
+
 import Header from './components/Header/Header';
 import Content from './components/Content/Content';
 
