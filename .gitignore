@@ -13,3 +13,5 @@ docker-compose.yml
 react-ui/.eslintcache
 
 data
+server/data/db.json
+react-ui/debug.log

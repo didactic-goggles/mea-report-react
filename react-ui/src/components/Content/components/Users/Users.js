@@ -1,56 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { useRouteMatch, Route, Switch, useHistory } from 'react-router-dom';
-import styled from 'styled-components';
-import { Spinner, Button } from "react-bootstrap";
+import React, { useEffect, useState, useRef } from "react";
+import { useRouteMatch, Route, Switch, useHistory } from "react-router-dom";
+
+import { Spinner } from "react-bootstrap";
 import Datatable from "react-data-table-component";
+import { Input, InputGroup, Icon } from "rsuite";
 import Axios from "axios";
-import moment from 'moment';
+import moment from "moment";
 import UserDetails from "./UserDetails";
-const TextField = styled.input`
-  height: 32px;
-  width: 200px;
-  border-radius: 3px;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  border: 1px solid #e5e5e5;
-  padding: 0 32px 0 16px;
-
-  &:hover {
-        columns={columns}
-    cursor: pointer;
-  }
-`;
-
-const ClearButton = styled(Button)`
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-        columns={columns}
-  .add('Show Table Head', () => <ProgressPendingIndeterminateHeader />);
-  height: 34px;
-  width: 32px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
 
 const Users = () => {
+  console.log("Rendering => Users");
   let history = useHistory();
   let { path, url } = useRouteMatch();
   const [loading, setLoading] = useState(true);
-  const [userSpents, setUserSpents] = useState([]);
-  const [selectedUser, setSelectedUser] = useState('');
-  const getUsersSpents = async () => {
-    const getUsersSpentsResponse = await Axios.get(
-      "/db/users"
-    );
-    console.log(getUsersSpentsResponse.data);
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedUser, setSelectedUser] = useState("");
+  const getUsers = async () => {
+    const getUsersResponse = await Axios.get("/db/users");
+    console.log(getUsersResponse.data);
     // setLoading(false);
-    setUserSpents(getUsersSpentsResponse.data);
+    setUsers(getUsersResponse.data);
+    setFilteredUsers(getUsersResponse.data);
   };
 
   const columns = React.useMemo(
@@ -69,7 +41,7 @@ const Users = () => {
         name: "Son Giriş",
         selector: "lastauth",
         sortable: true,
-        cell: row => moment(row.lastauth).format('DD/MM/YYYY')
+        cell: (row) => moment(row.lastauth).format("DD/MM/YYYY"),
       },
     ],
     []
@@ -78,11 +50,28 @@ const Users = () => {
   useEffect(() => {
     setLoading(true);
     const getter = async () => {
-      await getUsersSpents();
+      await getUsers();
       setLoading(false);
     };
     getter();
   }, []);
+
+  const onInputChange = (searchVal) => {
+    // const enteredUsers = searchVal.replace(' ', '').split(',');
+    // const filteredUserArray = users.filter(user => enteredUsers.indexOf(user.username) !== -1);
+    // setFilteredUsers(filteredUserArray);
+    console.log(searchVal);
+    // setEnteredUsers(searchVal);
+    // console.log(searchVal);
+  };
+
+  const searchHandler = () => {
+    console.log(searchValue);
+    // const enteredUsers = searchVal.replace(' ', '').split(',');
+    // const filteredUserArray = users.filter(user => enteredUsers.indexOf(user.username) !== -1);
+    // setFilteredUsers(filteredUserArray);
+    // console.log(searchVal);
+  };
 
   const loadingComponent = (
     <div
@@ -96,49 +85,44 @@ const Users = () => {
     </div>
   );
 
-  const FilterComponent = ({ filterText, onFilter, onClear }) => (
-    <>
-      <TextField id="search" type="text" placeholder="Filter By Name" aria-label="Search Input" value={filterText} onChange={onFilter} />
-      <ClearButton type="button" onClick={onClear}>X</ClearButton>
-    </>
-  );
-  const [filterText, setFilterText] = React.useState('');
-  const [resetPaginationToggle, setResetPaginationToggle] = React.useState(false);
-  const filteredItems = userSpents.filter(item => item.username && item.username.toLowerCase().includes(filterText.toLowerCase()));
-
-  const subHeaderComponentMemo = React.useMemo(() => {
-    const handleClear = () => {
-      if (filterText) {
-        setResetPaginationToggle(!resetPaginationToggle);
-        setFilterText('');
-      }
-    };
-
-    return <FilterComponent onFilter={e => setFilterText(e.target.value)} onClear={handleClear} filterText={filterText} />;
-  }, [filterText, resetPaginationToggle]);
+  const SubHeaderComponent = React.memo(() => {
+    return (
+      <form>
+        <InputGroup inside>
+          <Input
+            onChange={(event) => setSearchValue(event)}
+            key="input_search"
+          />
+          <InputGroup.Button onClick={searchHandler}>
+            <Icon icon="search" />
+          </InputGroup.Button>
+        </InputGroup>
+      </form>
+    );
+  });
 
   if (loading) {
     return loadingComponent;
   }
   return (
     <>
-
       <Switch>
         <Route exact path={path}>
           <div class="row">
             <div class="col-lg-12">
               <div class="mb-3 card">
                 <div class="card-body">
+                  {/* <SubHeaderComponent /> */}
                   <Datatable
                     title="Kullanıcılar"
                     columns={columns}
-                    data={filteredItems}
+                    data={filteredUsers}
                     pagination
                     subHeader
-                    subHeaderComponent={subHeaderComponentMemo}
+                    subHeaderComponent={<SubHeaderComponent />}
                     onRowClicked={(event) => {
                       setSelectedUser(event);
-                      history.push(`users/${event.id}`)
+                      history.push(`users/${event.id}`);
                     }}
                   />
                 </div>

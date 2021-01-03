@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouteMatch, Route, Switch, useHistory } from "react-router-dom";
-import {
-  Spinner,
-  Badge,
-  Button,
-  OverlayTrigger,
-  Popover,
-  Form,
-} from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import Datatable from "react-data-table-component";
 import moment from "moment";
 import Axios from "axios";

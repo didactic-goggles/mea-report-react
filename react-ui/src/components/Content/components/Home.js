@@ -8,10 +8,10 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [userSpents, setUserSpents] = useState([]);
     const getUsersSpents = async () => {
-        const getUsersSpentsResponse = await Axios.get('./data/users/userSpents.json');
-        console.log(getUsersSpentsResponse.data);
-        // setLoading(false);
-        setUserSpents(getUsersSpentsResponse.data);
+        // const getUsersSpentsResponse = await Axios.get('./data/users/userSpents.json');
+        // console.log(getUsersSpentsResponse.data);
+        // // setLoading(false);
+        // setUserSpents(getUsersSpentsResponse.data);
     }
 
     const columns = React.useMemo(() => [

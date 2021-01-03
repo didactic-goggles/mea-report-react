@@ -37,6 +37,7 @@ if (!isDev && cluster.isMaster) {
   app.post('/upload', function(req, res) {
     if (!req.files || Object.keys(req.files).length === 0)
       return res.status(400).send('No files were uploaded.');
+    
     const file = req.files.file;
     if(file.name.split('.').pop() != 'json')
       return res.status(400).send('This is not a json file');
