@@ -144,7 +144,7 @@ const ServiceDetails = (props) => {
       name: "Tarih",
       selector: "created",
       sortable: true,
-      cell: (row) => <span>{moment(row.created).format('DD/MM/YYYY')}</span>
+      cell: (row) => <span>{moment(row.created * 1000).format('DD/MM/YYYY')}</span>
     },
   ]);
 

@@ -67,7 +67,7 @@ const Users = () => {
 
   const Filters = () => (
     <div className="d-flex justify-content-end mb-3">
-      <TagPicker data={ users.legnth ? users.map(user => {
+      <TagPicker data={ users.length ? users.map(user => {
         return {
           label: user.username,
           value: user.username
