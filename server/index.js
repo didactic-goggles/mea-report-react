@@ -75,8 +75,10 @@ if (!isDev && cluster.isMaster) {
         });
         const jsString = JSON.stringify(db);
         fs.writeFile(__dirname + '/data/db.json', jsString, 'utf8', function (err, data) {
-          if (err)
+          if (err) {
+            console.log(error);
             return res.status(500).send(err);
+          }
           return res.status(200).send('Successful')
         });
       } catch ( error ) {

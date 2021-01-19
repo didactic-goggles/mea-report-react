@@ -67,12 +67,12 @@ const Users = () => {
 
   const Filters = () => (
     <div className="d-flex justify-content-end mb-3">
-      <TagPicker data={ users.length && users.map(user => {
+      <TagPicker data={ users.legnth ? users.map(user => {
         return {
           label: user.username,
           value: user.username
         }
-      })} style={{ width: 300 }} onChange={e=>onChangeHandler(e)} value={tagValue} placeholder='Kullanıcı seç'/>
+      }) : []} style={{ width: 300 }} onChange={e=>onChangeHandler(e)} value={tagValue} placeholder='Kullanıcı seç'/>
     </div>
   );
 
