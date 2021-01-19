@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useRouteMatch, Route, Switch, useHistory } from "react-router-dom";
-
-import { Spinner } from "react-bootstrap";
 import Datatable from "react-data-table-component";
-import { Input, InputGroup, Icon } from "rsuite";
-import Axios from "axios";
+import { TagPicker } from "rsuite";
+import API from "../../../../api";
 import moment from "moment";
 import UserDetails from "./UserDetails";
+import LoadingIndicator from "../../../UI/LoadingIndicator";
 
 const Users = () => {
   console.log("Rendering => Users");
@@ -14,15 +13,19 @@ const Users = () => {
   let { path, url } = useRouteMatch();
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
+  const [tagValue, setTagValue] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [searchValue, setSearchValue] = useState('');
   const [selectedUser, setSelectedUser] = useState("");
   const getUsers = async () => {
-    const getUsersResponse = await Axios.get("/db/users");
-    console.log(getUsersResponse.data);
-    // setLoading(false);
-    setUsers(getUsersResponse.data);
-    setFilteredUsers(getUsersResponse.data);
+    let query = "/db/users";
+    console.log(tagValue);
+    if(tagValue.length > 0)
+      query = "/db/users?" + tagValue.map(user => `username=${user}&`).join('')
+    const getUsersResponse = await API.get(query);
+    if(!users.length)
+      setUsers(getUsersResponse);
+    if(tagValue.length > 0)
+      setFilteredUsers(getUsersResponse);
   };
 
   const columns = React.useMemo(
@@ -51,58 +54,30 @@ const Users = () => {
     setLoading(true);
     const getter = async () => {
       await getUsers();
+      console.log(filteredUsers);
       setLoading(false);
     };
     getter();
-  }, []);
+  }, [selectedUser, tagValue]);
 
-  const onInputChange = (searchVal) => {
-    // const enteredUsers = searchVal.replace(' ', '').split(',');
-    // const filteredUserArray = users.filter(user => enteredUsers.indexOf(user.username) !== -1);
-    // setFilteredUsers(filteredUserArray);
-    console.log(searchVal);
-    // setEnteredUsers(searchVal);
-    // console.log(searchVal);
-  };
+  const onChangeHandler = event => {
+    console.log(event);
+    setTagValue(event);
+  }
 
-  const searchHandler = () => {
-    console.log(searchValue);
-    // const enteredUsers = searchVal.replace(' ', '').split(',');
-    // const filteredUserArray = users.filter(user => enteredUsers.indexOf(user.username) !== -1);
-    // setFilteredUsers(filteredUserArray);
-    // console.log(searchVal);
-  };
-
-  const loadingComponent = (
-    <div
-      className="d-flex align-items-center w-100 justify-content-center mt-auto"
-      style={{ height: "100%" }}
-    >
-      <Spinner animation="border" role="status" variant="primary">
-        <span className="sr-only">Loading...</span>
-      </Spinner>
-      <h3 className="ml-2">Loading</h3>
+  const Filters = () => (
+    <div className="d-flex justify-content-end mb-3">
+      <TagPicker data={users.map(user => {
+        return {
+          label: user.username,
+          value: user.username
+        }
+      })} style={{ width: 300 }} onChange={e=>onChangeHandler(e)} value={tagValue} placeholder='Kullanıcı seç'/>
     </div>
   );
 
-  const SubHeaderComponent = React.memo(() => {
-    return (
-      <form>
-        <InputGroup inside>
-          <Input
-            onChange={(event) => setSearchValue(event)}
-            key="input_search"
-          />
-          <InputGroup.Button onClick={searchHandler}>
-            <Icon icon="search" />
-          </InputGroup.Button>
-        </InputGroup>
-      </form>
-    );
-  });
-
   if (loading) {
-    return loadingComponent;
+    return <LoadingIndicator />;
   }
   return (
     <>
@@ -113,13 +88,12 @@ const Users = () => {
               <div class="mb-3 card">
                 <div class="card-body">
                   {/* <SubHeaderComponent /> */}
+                  <Filters />
                   <Datatable
                     title="Kullanıcılar"
                     columns={columns}
-                    data={filteredUsers}
+                    data={tagValue.length > 0 ? filteredUsers : users}
                     pagination
-                    subHeader
-                    subHeaderComponent={<SubHeaderComponent />}
                     onRowClicked={(event) => {
                       setSelectedUser(event);
                       history.push(`users/${event.id}`);

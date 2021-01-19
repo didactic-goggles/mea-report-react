@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Spinner } from "react-bootstrap";
 import Datatable from "react-data-table-component";
-import Axios from "axios";
-
+import API from "../../../../api";
+import LoadingIndicator from "../../../UI/LoadingIndicator";
 
 const Files = () => {
   console.log("Rendering => Files");
   const [loading, setLoading] = useState(true);
   const [files, setFiles] = useState([]);
+
   const getFiles = async () => {
-    const getFilesResponse = await Axios.get(`/db/files`);
-    console.log(getFilesResponse.data);
-    setFiles(getFilesResponse.data);
+    const getFilesResponse = await API.get(`/db/files`);
+    setFiles(getFilesResponse);
   };
 
   const columns = React.useMemo(() => [
@@ -70,20 +69,8 @@ const Files = () => {
     getter();
   }, []);
 
-  const loadingComponent = (
-    <div
-      className="d-flex align-items-center w-100 justify-content-center mt-auto"
-      style={{ height: "100%" }}
-    >
-      <Spinner animation="border" role="status" variant="primary">
-        <span className="sr-only">Loading...</span>
-      </Spinner>
-      <h3 className="ml-2">Loading</h3>
-    </div>
-  );
-
   if (loading) {
-    return loadingComponent;
+    return <LoadingIndicator />;
   }
   return (
     <>

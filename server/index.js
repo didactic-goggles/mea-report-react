@@ -55,6 +55,10 @@ if (!isDev && cluster.isMaster) {
         const uploadedJSON = JSON.parse(file.data);
         if(fileType == 'orders' || fileType == 'payments') {
           uploadedJSON.forEach(item => {
+            if(item.ID) {
+              item.id = item.ID;
+              delete item.ID;
+            }
             let compareDate = 'created' in uploadedJSON[0] ? 'created' : 'Created';
             item[compareDate] = moment(item[compareDate]).unix();
           })
@@ -77,6 +81,7 @@ if (!isDev && cluster.isMaster) {
         });
       } catch ( error ) {
         // console.log(error);
+        console.log(error);
         return res.status(400).send('Invalid json file');
       }
     });

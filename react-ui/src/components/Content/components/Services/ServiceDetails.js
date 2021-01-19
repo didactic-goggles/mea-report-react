@@ -2,19 +2,14 @@ import Axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import moment from "moment";
-import { DateRange } from "react-date-range";
+import API from "../../../../api";
 // import Chart from "react-apexcharts";
 // import ApexCharts from 'apexcharts';
-import {
-  Spinner,
-  Badge,
-  Button,
-  OverlayTrigger,
-  Popover,
-  Form,
-} from "react-bootstrap";
 import Datatable from "react-data-table-component";
 import Card from '../../../UI/Card';
+import DateRangePicker from '../../../UI/DateRangePicker';
+import BackButton from '../../../UI/BackButton';
+import LoadingIndicator from "../../../UI/LoadingIndicator";
 
 const ServiceDetails = (props) => {
   console.log("Rendering => PaymentDetails");
@@ -28,50 +23,25 @@ const ServiceDetails = (props) => {
   const [serviceDetails, setServiceDetails] = useState();
   const [filteredAllOrdersOfService, setFilteredAllOrdersOfService] = useState([]);
   console.log(selectedService);
-  const [selectedDate, setSelectedDate] = useState([
-    {
-      startDate: new Date(),
-      endDate: new Date(),
-      key: "selection",
-    },
-  ]);
+  const [selectedDate, setSelectedDate] = useState({
+    startDate: moment().subtract(7, "days").unix(),
+    endDate: moment().unix(),
+  });
 
   console.log(selectedDate);
 
   const getOrders = async () => {
     const tempOrders = [];
-    // const promiseArray = [];
-    const getOrdersResponse = await Axios.get(`/db/orders?service_id=${id}`);
-    tempOrders.push(...getOrdersResponse.data);
+    const getOrdersResponse = await API.get(`/db/orders?service_id=${id}&created_gte=${selectedDate.startDate}&created_lte=${selectedDate.endDate}`);
+    tempOrders.push(...getOrdersResponse);
     if (!selectedService) {
-      const getServideDetails = await Axios.get(`/db/services/${id}`);
-      selectedService = getServideDetails.data;
+      const getServideDetails = await API.get(`/db/services/${id}`);
+      selectedService = getServideDetails;
     }
-    // const tempAllOrdersOfService2 = tempOrders.filter((order) => order.service_id == selectedService.id);
-    // console.log(tempAllOrdersOfService2);
     const tempAllOrdersOfService = tempOrders.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i);
     setAllOrdersOfService(tempAllOrdersOfService);
 
     setOrders(tempAllOrdersOfService);
-    // console.log(tempOrders);
-    // const getPaymentsResponse = await Axios.get(
-    //     "/data/payments/payments.json"
-    // );
-    // console.log(getPaymentsResponse.data);
-    // aynı id li siparişleri silmek için
-
-    // const userPaymentsArray = tempPayments.filter(payment => payment.User == selectedPayment.User && payment.Status == 'Completed');
-    // const tempTotalPaymentObject = {
-    //     totalPayment: 0,
-    //     numberOfPayment: 0
-    // }
-    // userPaymentsArray.forEach(payment => {
-    //     tempTotalPaymentObject.totalPayment += Number(payment.Amount);
-    //     tempTotalPaymentObject.numberOfPayment++;
-    // })
-    // setLoading(false);
-    // setUserPayments(userPaymentsArray);
-    // setTotalPaymentDetails(tempTotalPaymentObject);
   };
 
   const setOrders = (orders) => {
@@ -103,82 +73,47 @@ const ServiceDetails = (props) => {
     setServiceDetails(tempServiceDetails);
   }
 
+  // useEffect(() => {
+  //   setLoading(true);
+  //   const getter = async () => {
+  //     await getOrders();
+  //     initDatatables();
+  //     setLoading(false);
+  //   };
+  //   getter();
+  // }, []);
+
   useEffect(() => {
     setLoading(true);
     const getter = async () => {
       await getOrders();
-      initDatatables();
       setLoading(false);
     };
     getter();
-  }, []);
-
-  useEffect(() => {
-    const tempArray = allOrdersOfService.filter(order => 
-      moment(order.created).isBetween(moment(selectedDate[0].startDate), moment(selectedDate[0].endDate))
-    )
-    console.log(allOrdersOfService);
-    console.log(tempArray);
-    setOrders(tempArray);
-    // setTotalPaymentDetails(tempTotalPaymentObject);
-    // // const filteredPaymentsByDate = userPayments.filter(payment =>
-    // //     moment(payment.Created).isBetween(moment(selectedDate[0].startDate), moment(selectedDate[0].endDate), null, "(]")
-    // // );
-    // // setUserPayments(filteredPaymentsByDate)
-    // // console.log(filteredPaymentsByDate);
-    // setUserPayments(tempArray)
   }, [selectedDate]);
 
-  const initDatatables = () => {
-
-  }
-
-  const onDateChangeHandler = () => {};
-
-  const loadingComponent = (
-    <div
-      className="d-flex align-items-center w-100 justify-content-center mt-auto"
-      style={{ height: "100%" }}
-    >
-      <Spinner animation="border" role="status" variant="primary">
-        <span className="sr-only">Loading...</span>
-      </Spinner>
-      <h3 className="ml-2">Loading</h3>
-    </div>
-  );
-
-  const popover = (
-    <Popover id="popover-basic">
-      <Popover.Content>
-        <DateRange
-          editableDateInputs={true}
-          onChange={(item) => setSelectedDate([item.selection])}
-          moveRangeOnFirstSelection={false}
-          ranges={selectedDate}
-        />
-      </Popover.Content>
-    </Popover>
-  );
-
-  const ToggleCalendar = () => (
-    <OverlayTrigger trigger="click" placement="bottom" overlay={popover}>
-      <Form.Group controlId="formBasicEmail">
-        <Form.Label>Tarih</Form.Label>
-        <Form.Control
-          type="text"
-          placeholder="başl.tar/bit.tar"
-          onChange={() => onDateChangeHandler()}
-          value={`${moment(selectedDate[0].startDate).format("DD-MM")}/${moment(
-            selectedDate[0].endDate
-          ).format("DD-MM")} ${moment(selectedDate[0].endDate).format("YYYY")}`}
-        />
-      </Form.Group>
-    </OverlayTrigger>
-  );
+  // useEffect(() => {
+  //   const tempArray = allOrdersOfService.filter(order => 
+  //     moment(order.created).isBetween(moment(selectedDate[0].startDate), moment(selectedDate[0].endDate))
+  //   )
+  //   console.log(allOrdersOfService);
+  //   console.log(tempArray);
+  //   setOrders(tempArray);
+  //   // setTotalPaymentDetails(tempTotalPaymentObject);
+  //   // // const filteredPaymentsByDate = userPayments.filter(payment =>
+  //   // //     moment(payment.Created).isBetween(moment(selectedDate[0].startDate), moment(selectedDate[0].endDate), null, "(]")
+  //   // // );
+  //   // // setUserPayments(filteredPaymentsByDate)
+  //   // // console.log(filteredPaymentsByDate);
+  //   // setUserPayments(tempArray)
+  // }, [selectedDate]);
 
   const Filters = () => (
-    <div>
-      <ToggleCalendar />
+    <div className="d-flex justify-content-end mb-3">
+      <DateRangePicker
+        selectedDateHandler={setSelectedDate}
+        selectedDate={selectedDate}
+      />
     </div>
   );
 
@@ -232,17 +167,11 @@ const ServiceDetails = (props) => {
   ]);
 
   if (loading) {
-    return loadingComponent;
+    return <LoadingIndicator />;
   }
   return (
     <>
-      <div className="row mb-3">
-        <div className="col-12">
-          <Button variant="light" onClick={() => history.goBack()}>
-            Geri
-          </Button>
-        </div>
-      </div>
+      <BackButton />
       {/* <div>
             <TotalUsagesGraphic />
         </div>
@@ -261,15 +190,13 @@ const ServiceDetails = (props) => {
                 </div>
             : null}
       </div>
-
+      <Filters />
       <div className="mb-3">
         <Datatable
             title={`${selectedService.id} ID'li Servisin Siparişleri`}
             columns={columnsForOrders}
             data={filteredAllOrdersOfService}
             pagination
-            subHeader
-            subHeaderComponent={<Filters />}
         />
       </div>
       <div className="mb-3">

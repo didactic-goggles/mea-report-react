@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useRouteMatch, Route, Switch, useHistory } from "react-router-dom";
-import { Spinner } from "react-bootstrap";
 import Datatable from "react-data-table-component";
 import moment from "moment";
-import Axios from "axios";
-import { DateRangePicker } from "rsuite";
+import API from "../../../../api";
 import PaymentDetails from "./PaymentDetails";
+import DateRangePicker from "../../../UI/DateRangePicker";
+import LoadingIndicator from "../../../UI/LoadingIndicator";
 
-import { Locale } from "../../../../constants/daterangepicker";
+
 const Payments = () => {
   console.log("Rendering => Payments");
   let history = useHistory();
@@ -22,7 +22,7 @@ const Payments = () => {
   });
   const getPayments = async (dateObject) => {
     setPending(true);
-    const getPaymentsResponse = await Axios.get(
+    const getPaymentsResponse = await API.get(
       `/db/payments?Created_gte=${dateObject.startDate}&Created_lte=${dateObject.endDate}`
     );
     setPayments(getPaymentsResponse.data);
@@ -47,56 +47,35 @@ const Payments = () => {
     },
   ]);
 
+  // useEffect(() => {
+  //   setLoading(true);
+  //   const getter = async () => {
+  //     getPayments({
+  //       startDate: moment().subtract(7, "days").unix(),
+  //       endDate: moment().unix(),
+  //     });
+  //     setLoading(false);
+  //   };
+  //   getter();
+  // }, []);
+
   useEffect(() => {
     setLoading(true);
     const getter = async () => {
-      getPayments({
-        startDate: moment().subtract(7, "days").unix(),
-        endDate: moment().unix(),
-      });
+      await getPayments(selectedDate);
       setLoading(false);
     };
     getter();
-  }, []);
-
-  useEffect(() => {
-    getPayments(selectedDate);
   }, [selectedDate]);
 
   const Filters = () => (
-    <div>
-      <DateRangePicker
-        placement={"bottomEnd"}
-        locale={Locale}
-        onChange={async (value) => {
-          const selectedDateObject = {
-            startDate: moment(value[0]).unix(),
-            endDate: moment(value[1]).unix(),
-          };
-          setSelectedDate(selectedDateObject);
-        }}
-        value={[
-          moment(selectedDate.startDate * 1000)._d,
-          moment(selectedDate.endDate * 1000)._d,
-        ]}
-      />
-    </div>
-  );
-
-  const loadingComponent = (
-    <div
-      className="d-flex align-items-center w-100 justify-content-center mt-auto"
-      style={{ height: "100%" }}
-    >
-      <Spinner animation="border" role="status" variant="primary">
-        <span className="sr-only">Loading...</span>
-      </Spinner>
-      <h3 className="ml-2">Loading</h3>
+    <div className="d-flex justify-content-end">
+      <DateRangePicker selectedDateHandler={setSelectedDate} selectedDate={selectedDate}/>
     </div>
   );
 
   if (loading) {
-    return loadingComponent;
+    return <LoadingIndicator/>;
   }
   return (
     <>
@@ -106,6 +85,7 @@ const Payments = () => {
             <div class="col-lg-12">
               <div class="mb-3 card">
                 <div class="card-body">
+                  <Filters />
                   <Datatable
                     title="Ödemeler"
                     columns={columns}
@@ -113,12 +93,12 @@ const Payments = () => {
                     pagination
                     onRowClicked={(event) => {
                       setSelectedPayment(event);
-                      history.push(`/payments/${event.ID}`);
+                      history.push(`/payments/${event.id}`);
                     }}
-                    subHeader
-                    subHeaderComponent={<Filters />}
-                    progressPending={pending}
-                    progressComponent={loadingComponent}
+                    // subHeader
+                    // subHeaderComponent={<Filters />}
+                    // progressPending={pending}
+                    // progressComponent={<LoadingIndicator />}
                   />
                 </div>
               </div>

@@ -11719,7 +11719,7 @@ button,
 
 .closed-sidebar .app-sidebar .app-sidebar__inner ul li a {
     text-indent: -99rem;
-    padding: 0
+    padding-left: 20px;
 }
 
 .closed-sidebar .app-sidebar .app-sidebar__inner .metismenu-icon {

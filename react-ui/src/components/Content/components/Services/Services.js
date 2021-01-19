@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useRouteMatch, Route, Switch, useHistory } from "react-router-dom";
-import { Spinner } from "react-bootstrap";
 import Datatable from "react-data-table-component";
-import Axios from "axios";
+import API from "../../../../api";
 import ServiceDetails from "./ServiceDetails";
+import LoadingIndicator from "../../../UI/LoadingIndicator";
 
 const Services = () => {
   console.log("Rendering => Services");
@@ -13,9 +13,9 @@ const Services = () => {
   const [services, setServices] = useState([]);
   const [selectedService, setSelectedService] = useState("");
   const getServices = async () => {
-    const getServicesResponse = await Axios.get(`/db/services`);
-    console.log(getServicesResponse.data);
-    setServices(getServicesResponse.data);
+    const getServicesResponse = await API.get(`/db/services`);
+    console.log(getServicesResponse);
+    setServices(getServicesResponse);
   };
 
   const columns = React.useMemo(() => [
@@ -50,20 +50,8 @@ const Services = () => {
     getter();
   }, []);
 
-  const loadingComponent = (
-    <div
-      className="d-flex align-items-center w-100 justify-content-center mt-auto"
-      style={{ height: "100%" }}
-    >
-      <Spinner animation="border" role="status" variant="primary">
-        <span className="sr-only">Loading...</span>
-      </Spinner>
-      <h3 className="ml-2">Loading</h3>
-    </div>
-  );
-
   if (loading) {
-    return loadingComponent;
+    return <LoadingIndicator />;
   }
   return (
     <>

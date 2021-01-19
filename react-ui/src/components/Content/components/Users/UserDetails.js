@@ -1,17 +1,17 @@
-import Axios from "axios";
 import React, {useState, useEffect} from "react";
-import {useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import API from "../../../../api";
 import Chart from "react-apexcharts";
 import ApexCharts from 'apexcharts';
 import Datatable from "react-data-table-component";
-import { Spinner, Badge, Button, OverlayTrigger, Popover, Form } from "react-bootstrap";
-import { DateRangePicker } from "rsuite";
+import DateRangePicker from "../../../UI/DateRangePicker";
+import BackButton from '../../../UI/BackButton';
 import moment from 'moment';
-import { Locale } from "../../../../constants/daterangepicker";
+import LoadingIndicator from "../../../UI/LoadingIndicator";
+
 
 const UserDetails = (props) => {
   console.log("Rendering => UserDetails");
-  let history = useHistory();
   let { id } = useParams();
   const [selectedUserDetails, setSelectedUserDetails ] = useState({});
   const [loading, setLoading] = useState(true);
@@ -21,21 +21,21 @@ const UserDetails = (props) => {
   });
   
   const getUserDetails = async () => {
-    const getSelectedUserResponse = await Axios.get(
+    const getSelectedUserResponse = await API.get(
         `/db/users/${id}`
     );
-    console.log(getSelectedUserResponse.data);
+    console.log(getSelectedUserResponse);
     
-    setSelectedUserDetails(getSelectedUserResponse.data);
+    setSelectedUserDetails(getSelectedUserResponse);
     console.log(selectedUserDetails);
-    await getUserPaymentsAndOrders(getSelectedUserResponse.data);
+    await getUserPaymentsAndOrders(getSelectedUserResponse);
   }
 
   const getUserPaymentsAndOrders = async (user) => {
     // console.log()
     if(user.username) {
-      const urls = [`/db/orders?user=${user.username}`, `/db/payments?User=${user.username}`];
-      var promises = urls.map(url => Axios.get(url));
+      const urls = [`/db/orders?user=${user.username}&created_gte=${selectedDate.startDate}&created_lte=${selectedDate.endDate}`, `/db/payments?User=${user.username}&Created_gte=${selectedDate.startDate}&Created_lte=${selectedDate.endDate}`];
+      var promises = urls.map(url => API.get(url));
       const responses = await Promise.all(promises);
       // console.log(responses);
       // const getUserOrders = await Axios.get(`/db/orders?user=${user.username}`);
@@ -46,7 +46,7 @@ const UserDetails = (props) => {
         quantity: 0,
         services: []
       };
-      responses[0].data.forEach((order) => {
+      responses[0].forEach((order) => {
         tempUser.spent += Number(order.cost);
         tempUser.quantity += 1;
         const isExistingServiceInUserSpendings = tempUser.services.findIndex(service => service.id == order.service_id)
@@ -66,33 +66,29 @@ const UserDetails = (props) => {
       setSelectedUserDetails({
         ...user,
         ...tempUser,
-        payments: responses[1].data
+        payments: responses[1]
       })
     }
   }
 
-  useEffect(() => {
-    setLoading(true);
-    const getter = async () => {
-        await getUserDetails();
-        // await getUserPaymentsAndOrders();
-        setLoading(false);
-    };
-    getter();
-    console.log(selectedUserDetails)
-}, []);
+//   useEffect(() => {
+//     setLoading(true);
+//     const getter = async () => {
+//         await getUserDetails();
+//         // await getUserPaymentsAndOrders();
+//         setLoading(false);
+//     };
+//     getter();
+//     console.log(selectedUserDetails)
+// }, []);
 
 useEffect(() => {
+  setLoading(true);
   const getter = async () => {
     // setPending(true);
     console.log(selectedUserDetails);
-    const getPaymentsResponse = await Axios.get(
-      `/db/payments?Created_gte=${selectedDate.startDate}&Created_lte=${selectedDate.endDate}&User=${selectedUserDetails.username}`
-    );
-    setSelectedUserDetails({
-      ...selectedUserDetails,
-      payments: getPaymentsResponse.data
-    })
+    await getUserDetails();
+    setLoading(false);
     // setPending(false);
   }
   getter();
@@ -337,15 +333,12 @@ useEffect(() => {
     );
   }
 
-  const loadingComponent = (
-    <div
-        className="d-flex align-items-center w-100 justify-content-center mt-auto"
-        style={{ height: "100%" }}
-    >
-        <Spinner animation="border" role="status" variant="primary">
-            <span className="sr-only">Loading...</span>
-        </Spinner>
-        <h3 className="ml-2">Loading</h3>
+  const Filters = () => (
+    <div className="d-flex justify-content-end mb-3">
+      <DateRangePicker
+        selectedDateHandler={setSelectedDate}
+        selectedDate={selectedDate}
+      />
     </div>
   );
 
@@ -375,41 +368,21 @@ useEffect(() => {
   );
 
   if (loading) {
-    return loadingComponent;
+    return <LoadingIndicator />;
   }
 
   return (
     <>
-      <div className="row mb-3">
-        <div className="col-12">
-          <Button variant="light" onClick={() => history.goBack()}>Geri</Button>
-        </div>
-      </div>
+      <BackButton />
       <div className="row mb-3">
         <div className="col-lg-6">{ChartSpents()}</div>
         <div className="col-lg-6">{ChartUsages()}</div>
       </div>
-      <div>
+      {/* <div>
         <ChartTotalUsagesTimeAxis />
-      </div>
+      </div> */}
       <div className="row justify-content-end">
-        <div>
-          <DateRangePicker
-            placement={"bottomEnd"}
-            locale={Locale}
-            onChange={async (value) => {
-              const selectedDateObject = {
-                startDate: moment(value[0]).unix(),
-                endDate: moment(value[1]).unix(),
-              };
-              setSelectedDate(selectedDateObject);
-            }}
-            value={[
-              moment(selectedDate.startDate * 1000)._d,
-              moment(selectedDate.endDate * 1000)._d,
-            ]}
-          />
-        </div>
+        <Filters />
       </div>
       <Datatable
         title="Harcama yaptığı servisler"
