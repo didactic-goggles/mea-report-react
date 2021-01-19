@@ -44,7 +44,7 @@ function Header() {
                         </div>
                         <button class="close"></button>
                     </div>
-                    <ul class="header-menu nav">
+                    {/* <ul class="header-menu nav">
                         <li class="nav-item">
                             <a href="javascript:void(0);" class="nav-link">
                                 <i class="nav-link-icon fa fa-database"> </i>
@@ -63,10 +63,10 @@ function Header() {
                                 Settings
                             </a>
                         </li>
-                    </ul>
+                    </ul> */}
                 </div>
                 <div class="app-header-right">
-                    <div class="header-btn-lg pr-0">
+                    {/* <div class="header-btn-lg pr-0">
                         <div class="widget-content p-0">
                             <div class="widget-content-wrapper">
                                 <div class="widget-content-left">
@@ -105,7 +105,7 @@ function Header() {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>
