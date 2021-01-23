@@ -42,51 +42,52 @@ if (!isDev && cluster.isMaster) {
     if(file.name.split('.').pop() != 'json')
       return res.status(400).send('This is not a json file');
   
-    fs.readFile(__dirname + '/data/db.json', 'utf8', function readFileCallback(err, data) {
-      let fileType = req.body.fileType;
-      if (err)
-        return res.status(500).send(err);
-      try {
-        const db = JSON.parse(data); //now it an object
-        // if(fileType == 'orders') {
-        //   db[fileType].push(...JSON.parse(file.data));
-        //   db[fileType] = db[fileType].filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i);
-        // }
-        const uploadedJSON = JSON.parse(file.data);
-        if(fileType == 'orders' || fileType == 'payments') {
-          uploadedJSON.forEach(item => {
-            if(item.ID) {
-              item.id = item.ID;
-              delete item.ID;
-            }
-            let compareDate = 'created' in uploadedJSON[0] ? 'created' : 'Created';
-            item[compareDate] = moment(item[compareDate]).unix();
-          })
-        }
-        db[fileType].push(...uploadedJSON);
-        // let compareKey = 'id' in db[fileType][0] ? 'id' : 'ID';
-        // db[fileType] = db[fileType].filter((v,i,a)=>a.findIndex(t=>(t[compareKey] === v[compareKey]))===i);
-        db.files.push({
-          name: file.name,
-          ext: file.name.split('.').pop(),
-          fileType: fileType,
-          created: new Date,
-          size: file.size
-        });
-        const jsString = JSON.stringify(db);
-        fs.writeFile(__dirname + '/data/db.json', jsString, 'utf8', function (err, data) {
-          if (err) {
-            console.log(error);
-            return res.status(500).send(err);
-          }
-          return res.status(200).send('Successful')
-        });
-      } catch ( error ) {
-        // console.log(error);
-        console.log(error);
-        return res.status(400).send('Invalid json file');
-      }
-    });
+    // fs.readFile(__dirname + '/data/db.json', 'utf8', function readFileCallback(err, data) {
+    //   let fileType = req.body.fileType;
+    //   if (err)
+    //     return res.status(500).send(err);
+    //   try {
+    //     const db = JSON.parse(data); //now it an object
+    //     // if(fileType == 'orders') {
+    //     //   db[fileType].push(...JSON.parse(file.data));
+    //     //   db[fileType] = db[fileType].filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i);
+    //     // }
+    //     const uploadedJSON = JSON.parse(file.data);
+    //     if(fileType == 'orders' || fileType == 'payments') {
+    //       uploadedJSON.forEach(item => {
+    //         if(item.ID) {
+    //           item.id = item.ID;
+    //           delete item.ID;
+    //         }
+    //         let compareDate = 'created' in uploadedJSON[0] ? 'created' : 'Created';
+    //         item[compareDate] = moment(item[compareDate]).unix();
+    //       })
+    //     }
+    //     db[fileType].push(...uploadedJSON);
+    //     // let compareKey = 'id' in db[fileType][0] ? 'id' : 'ID';
+    //     // db[fileType] = db[fileType].filter((v,i,a)=>a.findIndex(t=>(t[compareKey] === v[compareKey]))===i);
+    //     db.files.push({
+    //       name: file.name,
+    //       ext: file.name.split('.').pop(),
+    //       fileType: fileType,
+    //       created: new Date,
+    //       size: file.size
+    //     });
+    //     const jsString = JSON.stringify(db);
+    //     fs.writeFile(__dirname + '/data/db.json', jsString, 'utf8', function (err, data) {
+    //       if (err) {
+    //         console.log(error);
+    //         return res.status(500).send(err);
+    //       }
+    //       return res.status(200).send('Successful')
+    //     });
+    //   } catch ( error ) {
+    //     // console.log(error);
+    //     console.log(error);
+    //     return res.status(400).send('Invalid json file');
+    //   }
+    // });
+    return res.status(200).send('Successful')
   });
   
   app.use('/db', middlewares, router);
