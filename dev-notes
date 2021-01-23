@@ -1,0 +1,20 @@
+çoklu dosya yükleme
+
+
+Payment’ları import ettiğimizde;
+
+Haftalık şekilde düzenli ödeme yapan üyelerin coktan aza doğru listelenmesi;
+Üyelerin üstüne tıkladığımızda ödeme yaptığı günlerin, tutarlarıyla birlikte listelenmesi
+
+Burda ayrıca şöyle bir seçenek olmalı, paymentları ben son 1 yıllık yüklemeyi düşünüyorum mesela
+İmport ettiğim dosyada 1 yıl içinde bakiye yükleyen herkesin listesini görmem gerektiğini söylemiştim, burda çeşitli filtreler de istiyorum
+Mesela takvim üzerinden belirli aralıklarla yapılmış olan ödemeleri filtreleyebilmeyelim.
+Bu perfectpanel’in export ettirdiği kısımdaki gibi olabilir
+Yani girdiğim datadaki paymentları yapan üyelerin detaylı olarak ödeme yaptıkları aralıkları vs sistemden görebilmeliyim. bunun raporunu sistem bana nasıl sunar bilemiyorum , sana bırakıyorum
+Aslında burda , girilen verilerle alakalı yorum cıkarsa sistem daha iyi olur gibiYani üyeye tıkladığımdaToplam x kadar bakiye eklemiş bakiye eklediği günler ekledikleri tutar ortalaması 
+Ilk ve En son şu zaman bakiye eklemiş
+gibi bir ekran cıkarıp orda bu detaylı verebilir.
+
+Bu payment listesindeki ödeme yapan kişilerin çoktan aza doğru da sıralanıyor olması gerekmekte
+
+yani ben gireyim , x kişinin paymentlarını görüntülerken altta x kişisinin siparişleri seçeneği olsun ona tıkladıgımda da o adamın siparişleri açılsın o siparişlerin içinden de servise tıkladıgında servisin detayı gelsin vs

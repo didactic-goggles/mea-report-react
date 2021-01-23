@@ -3,6 +3,12 @@ import Axios from "axios";
 import Form from "react-bootstrap/Form";
 import { Row, Col, ProgressBar } from "react-bootstrap";
 import {Uploader, Alert, Button} from 'rsuite';
+
+import Order from '../../../../models/order';
+import Payment from '../../../../models/payment';
+import Service from '../../../../models/service';
+import User from '../../../../models/user';
+
 const Upload = () => {
     const [isFileUploading, setIsFileUploading] = useState(false);
     const [fileUploadProgress, setFileUplaodProgress] = useState(0);
@@ -13,23 +19,66 @@ const Upload = () => {
     console.log("submit");
     console.log(formFields);
     try {
-        const config = {
-            onUploadProgress: function (progressEvent) {
-                console.log(Math.round((progressEvent.loaded * 100) / progressEvent.total))
-                setFileUplaodProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
-            }
-        }
-        const uploadFormData = new FormData();
-        uploadFormData.append("file", formFields.uploadedFile);
-        uploadFormData.append("fileType", formFields.fileType || "orders");
-        const uploadFileResponse = await Axios.post("upload", uploadFormData, config);
-        if (uploadFileResponse) {
-          Alert.success('Dosya Yükleme başarılı', 5000);
-          // alert("successful");
-        }
+      if ('BackgroundFetchManager' in window.self) {
+        console.log('supported');
+      }
+        // const config = {
+        //     onUploadProgress: function (progressEvent) {
+        //         console.log(Math.round((progressEvent.loaded * 100) / progressEvent.total))
+        //         setFileUplaodProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+        //     }
+        // }
+        const uploadedJSON = await readFile(formFields.uploadedFile);
+        const postURL = `db/${formFields.fileType || "orders"}`;
+        const promiseArray = [];
+        uploadedJSON.map((item, index) => {
+          let formattedItem;
+          switch (formFields.fileType) {
+            case 'orders':
+              formattedItem = new Order(...Object.values(item))
+              break;
+            case 'payments':
+                formattedItem = new Payment(...Object.values(item))
+                break;
+            case 'services':
+              formattedItem = new Service(...Object.values(item))
+              break;
+            case 'users':
+                formattedItem = new User(...Object.values(item))
+                break;
+            default:
+              break;
+          }
+          // console.log(formattedItem)
+          promiseArray.push(Axios.post(postURL, formattedItem).then(result => setFileUplaodProgress(Math.round((index/uploadedJSON.length) * 100 ))));
+        });
+        await Promise.all(promiseArray);
+        Axios.post('db/files', {
+          name: formFields.uploadedFile.name,
+          ext: formFields.uploadedFile.name.split('.').pop(),
+          fileType: formFields.fileType,
+          created: new Date,
+          size: formFields.uploadedFile.size
+        });
+        Alert.success('Dosya Yükleme başarılı', 5000);
+        // await Axios.post(postURL, uploadedJSON[0], {
+        //   headers:  { 
+        //     'Accept': 'application/json',
+        //     'Content-Type': 'application/json'
+        //   }
+        // });
+        // const uploadedJSON = 
+        // const uploadFormData = new FormData();
+        // uploadFormData.append("file", formFields.uploadedFile);
+        // uploadFormData.append("fileType", formFields.fileType || "orders");
+        // const uploadFileResponse = await Axios.post("upload", uploadFormData, config);
+        // if (uploadFileResponse) {
+        //   Alert.success('Dosya Yükleme başarılı', 5000);
+        //   // alert("successful");
+        // }
     } catch ( error ) {
         console.log(error);
-        Alert.error(`Dosya Yükeleme başarısız. Hata mesajı: ${error.response.data}`, 5000);
+        // Alert.error(`Dosya Yükeleme başarısız. Hata mesajı: ${error.response.data}`, 5000);
     }
 
     setIsFileUploading(false);
@@ -50,10 +99,24 @@ const Upload = () => {
     console.log(files);
   };
 
+  const readFile = (file) => {
+    return new Promise((resolve, reject) => {
+      var fr = new FileReader();  
+      fr.onload = () => {
+        try {
+          resolve(JSON.parse(fr.result))
+        }catch(error) {
+          reject(error);
+        }
+      };
+      fr.readAsText(file);
+    });
+  }
+
   const FileProgress = () => {
     return <>
       <ProgressBar now={fileUploadProgress} label={`${fileUploadProgress}%`}/>
-      {fileUploadProgress == 100 ? <h5 className="text-center my-3">Dosya karşıya yüklendi. Kontrol ediliyor...</h5> : ""}
+      {/* {fileUploadProgress == 100 ? <h5 className="text-center my-3">Dosya karşıya yüklendi. Kontrol ediliyor...</h5> : ""} */}
     </>
     
   }
