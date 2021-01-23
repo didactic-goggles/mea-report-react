@@ -48,7 +48,7 @@ if (!isDev && cluster.isMaster) {
 
     const fileType = req.body.fileType;
     let job = await workQueue.add('jobUpload', {file, fileType});
-    return res.status(200).send(`Successful`);
+    return res.status(200).send(`Successful job-id: ${job.id}`);
   });
   
   app.use('/db', middlewares, router);
