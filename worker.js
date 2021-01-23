@@ -25,6 +25,7 @@ function start() {
   let workQueue = new Queue('work', REDIS_URL);
 
   workQueue.process(maxJobsPerWorker, async (job) => {
+    try {
     // const req = {};
     // req.body = job.data;
     const { file, fileType } = job.data;
@@ -91,6 +92,10 @@ function start() {
     // A job can return values that will be stored in Redis as JSON
     // This return value is unused in this demo application.
     return { value: "This will be stored" };
+    } catch ( error ) {
+      return error;
+    }
+
   });
 }
 

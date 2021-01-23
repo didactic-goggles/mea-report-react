@@ -48,7 +48,7 @@ if (!isDev && cluster.isMaster) {
 
     const fileType = req.body.fileType;
     let job = await workQueue.add('jobUpload', {file, fileType});
-    return res.status(200).send(`Successful job.id=${job.id}`);
+    return res.status(200).send(`Successful`);
   });
   
   app.use('/db', middlewares, router);
@@ -57,12 +57,13 @@ if (!isDev && cluster.isMaster) {
   app.get('*', function(request, response) {
     response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
   });
+  
+  workQueue.on('global:completed', (jobId, result) => {
+    console.log(`Job completed with result ${result}`);
+  });
 
   app.listen(PORT, function () {
     console.error(`Node ${isDev ? 'dev server' : 'cluster worker '+process.pid}: listening on port ${PORT}`);
   });
 
-  workQueue.on('global:completed', (jobId, result) => {
-    console.log(`Job completed with result ${result}`);
-  });
 }
