@@ -11,7 +11,7 @@
     }
   },
   "addons": [
-
+    "heroku-redis"
   ],
   "buildpacks": [
     {
