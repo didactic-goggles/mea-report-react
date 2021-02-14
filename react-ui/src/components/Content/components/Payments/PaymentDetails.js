@@ -3,8 +3,8 @@ import "react-date-range/dist/theme/default.css"; // theme css file
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import moment from "moment";
-import Chart from "react-apexcharts";
-import ApexCharts from "apexcharts";
+// import Chart from "react-apexcharts";
+// import ApexCharts from "apexcharts";
 import { Badge } from "react-bootstrap";
 import API from "../../../../api";
 import Datatable from "react-data-table-component";
@@ -32,13 +32,15 @@ const PaymentDetails = (props) => {
     const tempPayments = [];
 
     if (!selectedPayment) {
+      console.log(id);
       const getSelectedPaymentResponse = await API.get(`/db/payments/${id}`);
+      console.log(getSelectedPaymentResponse);
       if (getSelectedPaymentResponse)
         setSelectedPayment(getSelectedPaymentResponse);
     }
     if(selectedPayment) {
         const getPaymentsResponse = await API.get(
-          `/db/payments?User=${selectedPayment.User}&Status=Completed&Created_gte=${selectedDate.startDate}&Created_lte=${selectedDate.endDate}`
+          `/db/payments?user=${selectedPayment.user}&Status=completed&created_gte=${selectedDate.startDate}&created_lte=${selectedDate.endDate}`
         );
 
         if (getPaymentsResponse) tempPayments.push(...getPaymentsResponse);
@@ -54,7 +56,7 @@ const PaymentDetails = (props) => {
         setUserPayments(tempPayments);
         setTotalPaymentDetails(tempTotalPaymentObject);
     } else {
-        throw false;
+        return false;
     }
   };
 
@@ -251,30 +253,30 @@ const PaymentDetails = (props) => {
     () => [
       {
         name: "Metod",
-        selector: "Method",
+        selector: "method",
         sortable: true,
       },
       {
         name: "Tutar",
-        selector: "Amount",
+        selector: "amount",
         sortable: true,
       },
       {
         name: "Tarih",
-        selector: "Created",
+        selector: "created",
         sortable: true,
-        cell: (row) => moment(row.Created * 1000).format("DD/MM/YYYY"),
+        cell: (row) => moment(row.created * 1000).format("DD/MM/YYYY"),
       },
       {
         name: "Durum",
-        selector: "Status",
+        selector: "status",
         sortable: true,
         cell: (row) => {
           let statusObject = {};
-          if (row.Status == "Completed") {
+          if (row.status === "Completed") {
             statusObject.variant = "success";
             statusObject.text = "Tamamlandı";
-          } else if (row.Status == "Pending") {
+          } else if (row.status === "Pending") {
             statusObject.variant = "warning";
             statusObject.text = "Beklemede";
           }
@@ -326,7 +328,7 @@ const PaymentDetails = (props) => {
         ) : null}
       </div>
       <Datatable
-        title={`${selectedPayment.User} - Diğer Ödemeler`}
+        title={`${selectedPayment.user} - Diğer Ödemeler`}
         columns={columns}
         data={userPayments.filter((payment) => payment.visible !== false)}
         pagination

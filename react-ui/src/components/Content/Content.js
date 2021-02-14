@@ -11,7 +11,6 @@ function Content() {
                 <Sidebar />
                 <Container />
             </Router>
-            
         </div>
     )
 }

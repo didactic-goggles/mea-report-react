@@ -8,7 +8,7 @@ import LoadingIndicator from "../../../UI/LoadingIndicator";
 const Services = () => {
   console.log("Rendering => Services");
   let history = useHistory();
-  let { path, url } = useRouteMatch();
+  let { path } = useRouteMatch();
   const [loading, setLoading] = useState(true);
   const [services, setServices] = useState([]);
   const [selectedService, setSelectedService] = useState("");
@@ -35,7 +35,7 @@ const Services = () => {
     },
     {
       name: "Sağlayıcı",
-      selector: "provider",
+      selector: "prvd",
       sortable: true,
       maxWidth: '250px'
     },

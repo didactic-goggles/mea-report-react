@@ -63,14 +63,14 @@ export default function Sidebar() {
                                 <MdPayment />
                                     Ödeme Detayları</NavLink>
                             </li>
-                            <li class="app-sidebar__heading">Servisler</li>
+                            <li className="app-sidebar__heading">Servisler</li>
                             <li>
                                 <NavLink to="/services" activeClassName="mm-active">
                                     <MdShare />
                                     Servis Detayları
                                 </NavLink>
                             </li>
-                            <li class="app-sidebar__heading">Sistem</li>
+                            <li className="app-sidebar__heading">Sistem</li>
                             <li>
                                 <NavLink to="/upload" activeClassName="mm-active">
                                     <AiOutlineCloudUpload />

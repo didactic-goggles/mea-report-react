@@ -1,48 +1,48 @@
 import React from 'react';
-
+import ShowQueue from './components/ShowQueue';
 function Header() {
     return (
-        <div class="app-header header-shadow">
-            <div class="app-header__logo">
-                <div class="logo-src"></div>
-                <div class="header__pane ml-auto">
+        <div className="app-header header-shadow">
+            <div className="app-header__logo">
+                <div className="logo-src"></div>
+                <div className="header__pane ml-auto">
                     <div>
-                        <button type="button" class="hamburger close-sidebar-btn hamburger--elastic"
+                        <button type="button" className="hamburger close-sidebar-btn hamburger--elastic"
                             data-class="closed-sidebar">
-                            <span class="hamburger-box">
-                                <span class="hamburger-inner"></span>
+                            <span className="hamburger-box">
+                                <span className="hamburger-inner"></span>
                             </span>
                         </button>
                     </div>
                 </div>
             </div>
-            <div class="app-header__mobile-menu">
+            <div className="app-header__mobile-menu">
                 <div>
-                    <button type="button" class="hamburger hamburger--elastic mobile-toggle-nav">
-                        <span class="hamburger-box">
-                            <span class="hamburger-inner"></span>
+                    <button type="button" className="hamburger hamburger--elastic mobile-toggle-nav">
+                        <span className="hamburger-box">
+                            <span className="hamburger-inner"></span>
                         </span>
                     </button>
                 </div>
             </div>
-            <div class="app-header__menu">
+            <div className="app-header__menu">
                 <span>
                     <button type="button"
-                        class="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
-                        <span class="btn-icon-wrapper">
-                            <i class="fa fa-ellipsis-v fa-w-6"></i>
+                        className="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
+                        <span className="btn-icon-wrapper">
+                            <i className="fa fa-ellipsis-v fa-w-6"></i>
                         </span>
                     </button>
                 </span>
             </div>
-            <div class="app-header__content">
-                <div class="app-header-left">
-                    <div class="search-wrapper">
-                        <div class="input-holder">
-                            <input type="text" class="search-input" placeholder="Type to search" />
-                            <button class="search-icon"><span></span></button>
+            <div className="app-header__content">
+                <div className="app-header-left">
+                    <div className="search-wrapper">
+                        <div className="input-holder">
+                            <input type="text" className="search-input" placeholder="Type to search" />
+                            <button className="search-icon"><span></span></button>
                         </div>
-                        <button class="close"></button>
+                        <button className="close"></button>
                     </div>
                     {/* <ul class="header-menu nav">
                         <li class="nav-item">
@@ -65,7 +65,8 @@ function Header() {
                         </li>
                     </ul> */}
                 </div>
-                <div class="app-header-right">
+                <div className="app-header-right">
+                    <ShowQueue />
                     {/* <div class="header-btn-lg pr-0">
                         <div class="widget-content p-0">
                             <div class="widget-content-wrapper">

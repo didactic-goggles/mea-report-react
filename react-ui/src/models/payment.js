@@ -8,6 +8,7 @@ class Payment {
     amount,
     method,
     status,
+    memo,
     created,
     completed,
     ip,
@@ -20,7 +21,7 @@ class Payment {
     this.method = method;
     this.status = status;
     this.created = moment(created).unix();
-    this.completed = moment(completed).unix();
+    this.completed = Number(completed);
     this.ip = ip;
     this.mode = mode;
   }

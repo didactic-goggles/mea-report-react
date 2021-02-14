@@ -14,8 +14,8 @@ import Files from './System/Files';
 function Container() {
     console.log('Rendering => Container');
   return (
-    <div class="app-main__outer">
-      <div class="app-main__inner">
+    <div className="app-main__outer">
+      <div className="app-main__inner">
         <Switch>
           <Route path="/users">
             <Users />

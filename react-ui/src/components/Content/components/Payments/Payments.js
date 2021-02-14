@@ -11,9 +11,9 @@ import LoadingIndicator from "../../../UI/LoadingIndicator";
 const Payments = () => {
   console.log("Rendering => Payments");
   let history = useHistory();
-  let { path, url } = useRouteMatch();
+  let { path } = useRouteMatch();
   const [loading, setLoading] = useState(true);
-  const [pending, setPending] = useState(false);
+  // const [pending, setPending] = useState(false);
   const [payments, setPayments] = useState([]);
   const [selectedPayment, setSelectedPayment] = useState("");
   const [selectedDate, setSelectedDate] = useState({
@@ -21,28 +21,28 @@ const Payments = () => {
     endDate: moment().unix(),
   });
   const getPayments = async (dateObject) => {
-    setPending(true);
+    // setPending(true);
     const getPaymentsResponse = await API.get(
-      `/db/payments?Created_gte=${dateObject.startDate}&Created_lte=${dateObject.endDate}`
+      `/db/payments?created_gte=${dateObject.startDate}&created_lte=${dateObject.endDate}`
     );
-    setPayments(getPaymentsResponse.data);
-    setPending(false);
+    setPayments(getPaymentsResponse);
+    // setPending(false);
   };
 
   const columns = React.useMemo(() => [
     {
       name: "Ad",
-      selector: "User",
+      selector: "user",
       sortable: true,
     },
     {
       name: "Metod",
-      selector: "Method",
+      selector: "method",
       sortable: true,
     },
     {
       name: "Tutar",
-      selector: "Amount",
+      selector: "amount",
       sortable: true,
     },
   ]);
@@ -81,10 +81,10 @@ const Payments = () => {
     <>
       <Switch>
         <Route exact path={path}>
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="mb-3 card">
-                <div class="card-body">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="mb-3 card">
+                <div className="card-body">
                   <Filters />
                   <Datatable
                     title="Ödemeler"
@@ -106,10 +106,10 @@ const Payments = () => {
           </div>
         </Route>
         <Route path={`${path}/:id`}>
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="mb-3 card">
-                <div class="card-body">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="mb-3 card">
+                <div className="card-body">
                   <PaymentDetails selectedPayment={selectedPayment} />
                 </div>
               </div>

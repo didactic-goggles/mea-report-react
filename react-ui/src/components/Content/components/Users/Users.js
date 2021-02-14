@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouteMatch, Route, Switch, useHistory } from "react-router-dom";
 import Datatable from "react-data-table-component";
 import { TagPicker } from "rsuite";
@@ -10,7 +10,7 @@ import LoadingIndicator from "../../../UI/LoadingIndicator";
 const Users = () => {
   console.log("Rendering => Users");
   let history = useHistory();
-  let { path, url } = useRouteMatch();
+  let { path } = useRouteMatch();
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
   const [tagValue, setTagValue] = useState([]);
@@ -20,7 +20,7 @@ const Users = () => {
     let query = "/db/users";
     console.log(tagValue);
     if(tagValue.length > 0)
-      query = "/db/users?" + tagValue.map(user => `username=${user}&`).join('')
+      query = "/db/users?" + tagValue.map(user => `user=${user}&`).join('')
     const getUsersResponse = await API.get(query);
     if(!users.length)
       setUsers(getUsersResponse);
@@ -32,7 +32,7 @@ const Users = () => {
     () => [
       {
         name: "Ad",
-        selector: "username",
+        selector: "user",
         sortable: true,
       },
       {
@@ -42,9 +42,9 @@ const Users = () => {
       },
       {
         name: "Son Giriş",
-        selector: "lastauth",
+        selector: "lAuth",
         sortable: true,
-        cell: (row) => moment(row.lastauth).format("DD/MM/YYYY"),
+        cell: (row) => moment(row.lAuth * 1000).format("DD/MM/YYYY"),
       },
     ],
     []
@@ -69,8 +69,8 @@ const Users = () => {
     <div className="d-flex justify-content-end mb-3">
       <TagPicker data={ users.length ? users.map(user => {
         return {
-          label: user.username,
-          value: user.username
+          label: user.user,
+          value: user.user
         }
       }) : []} style={{ width: 300 }} onChange={e=>onChangeHandler(e)} value={tagValue} placeholder='Kullanıcı seç'/>
     </div>

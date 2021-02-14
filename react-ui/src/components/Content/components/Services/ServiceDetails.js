@@ -1,6 +1,6 @@
-import Axios from "axios";
+// import Axios from "axios";
 import React, { useState, useEffect } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import moment from "moment";
 import API from "../../../../api";
 // import Chart from "react-apexcharts";
@@ -13,7 +13,7 @@ import LoadingIndicator from "../../../UI/LoadingIndicator";
 
 const ServiceDetails = (props) => {
   console.log("Rendering => PaymentDetails");
-  let history = useHistory();
+  // let history = useHistory();
   let { selectedService } = props;
   let { id } = useParams();
 
@@ -38,7 +38,7 @@ const ServiceDetails = (props) => {
       const getServideDetails = await API.get(`/db/services/${id}`);
       selectedService = getServideDetails;
     }
-    const tempAllOrdersOfService = tempOrders.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i);
+    const tempAllOrdersOfService = tempOrders.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id)) ===i);
     setAllOrdersOfService(tempAllOrdersOfService);
 
     setOrders(tempAllOrdersOfService);
@@ -58,7 +58,7 @@ const ServiceDetails = (props) => {
         const userOrderIndex = tempUsersOfService.findIndex(user => user.user === order.user);
         tempServiceDetails.quantity += 1;
         tempServiceDetails.amount += Number(order.charge);
-        if( userOrderIndex == -1) {
+        if( userOrderIndex === -1) {
             tempUsersOfService.push({
                 user: order.user,
                 quantity: 1,
@@ -156,7 +156,7 @@ const ServiceDetails = (props) => {
     },
     {
         name: "Toplam Sipariş",
-        selector: "quantity",
+        selector: "qt",
         sortable: true
       },
       {
@@ -179,9 +179,9 @@ const ServiceDetails = (props) => {
             <TotalUsagesTimeAxisGraphic />
         </div> */}
       <div className="row mb-3">
-            {serviceDetails.quantity ? 
+            {serviceDetails.qt ? 
                 <div className="col-md-6 col-xl-4">
-                    <Card variant="bg-midnight-bloom" details={{number: serviceDetails.quantity, title: 'Bu dönemki toplam sipariş adedi'}} />
+                    <Card variant="bg-midnight-bloom" details={{number: serviceDetails.qt, title: 'Bu dönemki toplam sipariş adedi'}} />
                 </div>
             : null}
             {serviceDetails.amount ? 

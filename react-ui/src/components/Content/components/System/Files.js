@@ -35,13 +35,13 @@ const Files = () => {
       maxWidth: '100px',
       cell: row => {
         let content;
-        if(row.fileType == 'services')
+        if(row.fileType === 'services')
           content = 'Servis'
-        else if(row.fileType == 'users')
+        else if(row.fileType === 'users')
           content = 'Kullanıcı'
-        else if(row.fileType == 'orders')
+        else if(row.fileType === 'orders')
           content = 'Sipariş'
-        else if(row.fileType == 'payments')
+        else if(row.fileType === 'payments')
           content = 'Ödeme'
       return <span>{content}</span>
       }

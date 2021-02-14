@@ -32,43 +32,48 @@ const UserDetails = (props) => {
   }
 
   const getUserPaymentsAndOrders = async (user) => {
-    // console.log()
-    if(user.username) {
-      const urls = [`/db/orders?user=${user.username}&created_gte=${selectedDate.startDate}&created_lte=${selectedDate.endDate}`, `/db/payments?User=${user.username}&Created_gte=${selectedDate.startDate}&Created_lte=${selectedDate.endDate}`];
-      var promises = urls.map(url => API.get(url));
-      const responses = await Promise.all(promises);
-      // console.log(responses);
-      // const getUserOrders = await Axios.get(`/db/orders?user=${user.username}`);
-      // const response = await Promise.all(Axios.get(`/db/orders?user=${user.username}`), Axios.get(`/db/payments?user=${user.username}`));
-      // console.log(response);
-      const tempUser = {
-        spent: 0,
-        quantity: 0,
-        services: []
-      };
-      responses[0].forEach((order) => {
-        tempUser.spent += Number(order.cost);
-        tempUser.quantity += 1;
-        const isExistingServiceInUserSpendings = tempUser.services.findIndex(service => service.id == order.service_id)
-        if(isExistingServiceInUserSpendings != -1) {
-          const updatedServiceSpent = tempUser.services[isExistingServiceInUserSpendings].spent + Number(order.cost)
-          tempUser.services[isExistingServiceInUserSpendings].quantity += 1;
-          tempUser.services[isExistingServiceInUserSpendings].spent = updatedServiceSpent;
-        } else {
-          tempUser.services.push({
-            id: order.service_id,
-            name: order.service_name,
-            quantity: 1,
-            spent: Number(order.cost)
-          })
-        }
-      })
-      setSelectedUserDetails({
-        ...user,
-        ...tempUser,
-        payments: responses[1]
-      })
+    try {
+      if(user.user) {
+        const urls = [`/db/orders?user=${user.user}&created_gte=${selectedDate.startDate}&created_lte=${selectedDate.endDate}`, `/db/payments?user=${user.user}&created_gte=${selectedDate.startDate}&created_lte=${selectedDate.endDate}`];
+        var promises = urls.map(url => API.get(url));
+        const responses = await Promise.all(promises);
+        // console.log(responses);
+        // const getUserOrders = await Axios.get(`/db/orders?user=${user.username}`);
+        // const response = await Promise.all(Axios.get(`/db/orders?user=${user.username}`), Axios.get(`/db/payments?user=${user.username}`));
+        // console.log(response);
+        const tempUser = {
+          spent: 0,
+          quantity: 0,
+          services: []
+        };
+        responses[0].forEach((order) => {
+          tempUser.spent += Number(order.cost);
+          tempUser.quantity += 1;
+          const isExistingServiceInUserSpendings = tempUser.services.findIndex(service => service.id === order.s_id)
+          if(isExistingServiceInUserSpendings !== -1) {
+            const updatedServiceSpent = tempUser.services[isExistingServiceInUserSpendings].spent + Number(order.cost)
+            tempUser.services[isExistingServiceInUserSpendings].quantity += 1;
+            tempUser.services[isExistingServiceInUserSpendings].spent = updatedServiceSpent;
+          } else {
+            tempUser.services.push({
+              id: order.s_id,
+              name: order.s_name,
+              quantity: 1,
+              spent: Number(order.cost)
+            })
+          }
+        });
+        setSelectedUserDetails({
+          ...user,
+          ...tempUser,
+          payments: responses[1]
+        })
+      }
+    } catch (error) {
+      setLoading(false);
     }
+    // console.log()
+    
   }
 
 //   useEffect(() => {
@@ -86,7 +91,6 @@ useEffect(() => {
   setLoading(true);
   const getter = async () => {
     // setPending(true);
-    console.log(selectedUserDetails);
     await getUserDetails();
     setLoading(false);
     // setPending(false);
@@ -100,7 +104,8 @@ useEffect(() => {
       const chartUsagesArray = selectedUserDetails.services.sort((service1, service2) =>
         service1.quantity < service2.quantity ? 1 : -1
       );
-  
+      
+      console.log(chartUsagesArray);
       var optionsChartUsages = {
         chart: {
           width: 200,
@@ -207,7 +212,7 @@ useEffect(() => {
 
   const ChartTotalUsagesTimeAxis = () => {
     let data = selectedUserDetails.payments.map(payment => {
-        return [moment(payment.Created).valueOf(), Number(payment.Amount)]
+        return [moment(payment.created).valueOf(), Number(payment.Amount)]
     }).sort((a,b) => a[0] > b[0] ? 1 : -1);
     console.log(data);
     const [graphicState, setGraphicState] = useState({
@@ -307,22 +312,22 @@ useEffect(() => {
         <div id="chart">
             <div class="toolbar">
                 <button id="one_month"
-                    onClick={()=>updateData('one_month')} className={ (graphicState.selection==='one_month' ? 'active' : '')}>
+                    onClick={()=>updateData('one_month')} className={ (graphicState.selection ==='one_month' ? 'active' : '')}>
                     1 Ay
                 </button>
                 &nbsp;
                 <button id="six_months"
-                    onClick={()=>updateData('six_months')} className={ (graphicState.selection==='six_months' ? 'active' : '')}>
+                    onClick={()=>updateData('six_months')} className={ (graphicState.selection ==='six_months' ? 'active' : '')}>
                     6 Ay
                 </button>
                 &nbsp;
                 <button id="one_year"
-                    onClick={()=>updateData('one_year')} className={ (graphicState.selection==='one_year' ? 'active' : '')}>
+                    onClick={()=>updateData('one_year')} className={ (graphicState.selection ==='one_year' ? 'active' : '')}>
                     1 Yıl
                 </button>
                 &nbsp;
                 <button id="all"
-                    onClick={()=>updateData('all')} className={ (graphicState.selection==='all' ? 'active' : '')}>
+                    onClick={()=>updateData('all')} className={ (graphicState.selection ==='all' ? 'active' : '')}>
                     Hepsi
                 </button>
             </div>
