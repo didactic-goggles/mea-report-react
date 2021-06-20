@@ -1,6 +1,9 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../store/reducers/upload';
 import ShowQueue from './components/ShowQueue';
 function Header() {
+    const dispatch = useDispatch();
     return (
         <div className="app-header header-shadow">
             <div className="app-header__logo">
@@ -67,6 +70,11 @@ function Header() {
                 </div>
                 <div className="app-header-right">
                     <ShowQueue />
+                    <button onClick={() => {
+                        dispatch(logout());
+                    }}>
+                        Logout
+                    </button>
                     {/* <div class="header-btn-lg pr-0">
                         <div class="widget-content p-0">
                             <div class="widget-content-wrapper">

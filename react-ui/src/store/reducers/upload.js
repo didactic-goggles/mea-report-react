@@ -6,26 +6,33 @@ const initialState = {
   posts: [],
   status: 'idle',
   error: null,
+  auth: true,
 };
+
+export const logout = createAsyncThunk('jobs/logout', async (payload) => {
+  return false;
+});
 
 export const addNewJob = createAsyncThunk(
   'jobs/addNewJob',
   async (job, ThunkAPI) => {
     function fetchItemToServer(item) {
-    //     console.log(job)
-    //   setTimeout(() => {
-    //     // const state1 = ThunkAPI.getState();
-    //     ThunkAPI.dispatch(
-    //       updateJob({
-    //         id: job.id,
-    //       })
-    //     );
-    //   }, 100);
-    //   return 1;
+      //     console.log(job)
+      //   setTimeout(() => {
+      //     // const state1 = ThunkAPI.getState();
+      //     ThunkAPI.dispatch(
+      //       updateJob({
+      //         id: job.id,
+      //       })
+      //     );
+      //   }, 100);
+      //   return 1;
       return client.post(job.url, item).then(() => {
-          ThunkAPI.dispatch(updateJob({
-              id: job.id
-          }))
+        ThunkAPI.dispatch(
+          updateJob({
+            id: job.id,
+          })
+        );
       });
     }
 
@@ -46,13 +53,16 @@ const jobsSlice = createSlice({
   reducers: {
     updateJob(state, action) {
       const { id } = action.payload;
-      const existingJob = state.jobs.find((post) => post.id === id);
+      const existingJob = state.jobs.find((job) => job.id === id);
       if (existingJob) {
         existingJob.completedThreadSize++;
       }
     },
   },
   extraReducers: {
+    [logout.fulfilled]: (state, action) => {
+        state.auth = false;
+    },
     [addNewJob.pending]: (state, action) => {
       state.jobs.push({
         id: action.meta.arg.id,
@@ -80,16 +90,13 @@ const jobsSlice = createSlice({
   },
 });
 
-export const {
-  updateJob
-} = jobsSlice.actions;
+export const { updateJob } = jobsSlice.actions;
 
 export default jobsSlice.reducer;
 
 export const selectAllJobs = (state) => state.upload.jobs;
 
-export const selectPostById = (state, postId) =>
-  state.posts.posts.find((post) => post.id === postId);
+export const getAuthState = (state) => state.upload.auth;
 
 function all(items, fn) {
   const promises = items.map((item) => fn(item));
@@ -110,7 +117,7 @@ function series(items, fn) {
     .then(() => result);
 }
 
-function splitToChunks(items, chunkSize = 25) {
+function splitToChunks(items, chunkSize = 100) {
   const result = [];
   for (let i = 0; i < items.length; i += chunkSize) {
     result.push(items.slice(i, i + chunkSize));
@@ -118,7 +125,7 @@ function splitToChunks(items, chunkSize = 25) {
   return result;
 }
 
-function chunks(items, fn, chunkSize = 50) {
+function chunks(items, fn, chunkSize = 200) {
   let result = [];
   const chunks = splitToChunks(items, chunkSize);
   return series(chunks, (chunk) => {
