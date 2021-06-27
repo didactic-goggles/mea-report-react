@@ -6,8 +6,10 @@ import {
 
 import Home from "./Home";
 import Users from "./Users/Users";
+import UserDetails from "./Users/UserDetails";
 import Payments from "./Payments/Payments";
 import Services from './Services/Services';
+import ServiceDetails from './Services/ServiceDetails';
 import Upload from './System/Upload';
 import Files from './System/Files';
 
@@ -20,11 +22,17 @@ function Container() {
           <Route path="/users">
             <Users />
           </Route>
+          <Route path="/user/:userId">
+            <UserDetails />
+          </Route>
           <Route path="/payments">
             <Payments />
           </Route>
           <Route path="/services">
             <Services />
+          </Route>
+          <Route path="/service/:serviceId">
+            <ServiceDetails />
           </Route>
           <Route path="/upload">
             <Upload />

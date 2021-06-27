@@ -1,50 +1,48 @@
-import React, { useEffect, useState } from "react";
-import { useRouteMatch, Route, Switch, useHistory } from "react-router-dom";
-import Datatable from "react-data-table-component";
-import { TagPicker } from "rsuite";
-import API from "../../../../api";
-import moment from "moment";
-import UserDetails from "./UserDetails";
-import LoadingIndicator from "../../../UI/LoadingIndicator";
+import React, { useEffect, useState } from 'react';
+import { useRouteMatch, Route, Switch, useHistory } from 'react-router-dom';
+import Datatable from 'react-data-table-component';
+import { TagPicker } from 'rsuite';
+import API from '../../../../api';
+import moment from 'moment';
+import UserDetails from './UserDetails';
+import LoadingIndicator from '../../../UI/LoadingIndicator';
 
 const Users = () => {
-  console.log("Rendering => Users");
+  console.log('Rendering => Users');
   let history = useHistory();
-  let { path } = useRouteMatch();
+  // let { path } = useRouteMatch();
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
   const [tagValue, setTagValue] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState("");
+  // const [selectedUser, setSelectedUser] = useState('');
   const getUsers = async () => {
-    let query = "/db/users";
+    let query = '/db/users';
     console.log(tagValue);
-    if(tagValue.length > 0)
-      query = "/db/users?" + tagValue.map(user => `user=${user}&`).join('')
+    if (tagValue.length > 0)
+      query = '/db/users?' + tagValue.map((user) => `user=${user}&`).join('');
     const getUsersResponse = await API.get(query);
-    if(!users.length)
-      setUsers(getUsersResponse);
-    if(tagValue.length > 0)
-      setFilteredUsers(getUsersResponse);
+    if (!users.length) setUsers(getUsersResponse);
+    if (tagValue.length > 0) setFilteredUsers(getUsersResponse);
   };
 
   const columns = React.useMemo(
     () => [
       {
-        name: "Ad",
-        selector: "user",
+        name: 'Ad',
+        selector: 'user',
         sortable: true,
       },
       {
-        name: "Bakiye",
-        selector: "balance",
+        name: 'Bakiye',
+        selector: 'balance',
         sortable: true,
       },
       {
-        name: "Son Giriş",
-        selector: "lAuth",
+        name: 'Son Giriş',
+        selector: 'lAuth',
         sortable: true,
-        cell: (row) => moment(row.lAuth * 1000).format("DD/MM/YYYY"),
+        cell: (row) => moment(row.lAuth * 1000).format('DD/MM/YYYY'),
       },
     ],
     []
@@ -58,21 +56,31 @@ const Users = () => {
       setLoading(false);
     };
     getter();
-  }, [selectedUser, tagValue]);
+  }, [tagValue]);
 
-  const onChangeHandler = event => {
+  const onChangeHandler = (event) => {
     console.log(event);
     setTagValue(event);
-  }
+  };
 
   const Filters = () => (
     <div className="d-flex justify-content-end mb-3">
-      <TagPicker data={ users.length ? users.map(user => {
-        return {
-          label: user.user,
-          value: user.user
+      <TagPicker
+        data={
+          users.length
+            ? users.map((user) => {
+                return {
+                  label: user.user,
+                  value: user.user,
+                };
+              })
+            : []
         }
-      }) : []} style={{ width: 300 }} onChange={e=>onChangeHandler(e)} value={tagValue} placeholder='Kullanıcı seç'/>
+        style={{ width: 300 }}
+        onChange={(e) => onChangeHandler(e)}
+        value={tagValue}
+        placeholder="Kullanıcı seç"
+      />
     </div>
   );
 
@@ -81,41 +89,29 @@ const Users = () => {
   }
   return (
     <>
-      <Switch>
-        <Route exact path={path}>
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="mb-3 card">
-                <div class="card-body">
-                  {/* <SubHeaderComponent /> */}
-                  <Filters />
-                  <Datatable
-                    title="Kullanıcılar"
-                    columns={columns}
-                    data={tagValue.length > 0 ? filteredUsers : users}
-                    pagination
-                    onRowClicked={(event) => {
-                      setSelectedUser(event);
-                      history.push(`users/${event.id}`);
-                    }}
-                  />
-                </div>
-              </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="mb-3 card">
+            <div class="card-body">
+              {/* <SubHeaderComponent /> */}
+              <Filters />
+              <Datatable
+                title="Kullanıcılar"
+                columns={columns}
+                data={tagValue.length > 0 ? filteredUsers : users}
+                pagination
+                responsive={true}
+                striped={true}
+                highlightOnHover={true}
+                pointerOnHover={true}
+                onRowClicked={(event) => {
+                  history.push(`user/${event.id}`);
+                }}
+              />
             </div>
           </div>
-        </Route>
-        <Route path={`${path}/:id`}>
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="mb-3 card">
-                <div class="card-body">
-                  <UserDetails selectedUser={selectedUser} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Route>
-      </Switch>
+        </div>
+      </div>
     </>
   );
 };

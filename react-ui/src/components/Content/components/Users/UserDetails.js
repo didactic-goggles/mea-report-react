@@ -12,24 +12,14 @@ import LoadingIndicator from "../../../UI/LoadingIndicator";
 
 const UserDetails = (props) => {
   console.log("Rendering => UserDetails");
-  let { id } = useParams();
-  const [selectedUserDetails, setSelectedUserDetails ] = useState({});
+  let { userId } = useParams();
+  const [user, setUser ] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState({
     startDate: moment().subtract(7, "days").unix(),
     endDate: moment().unix(),
   });
-  
-  const getUserDetails = async () => {
-    const getSelectedUserResponse = await API.get(
-        `/db/users/${id}`
-    );
-    console.log(getSelectedUserResponse);
-    
-    setSelectedUserDetails(getSelectedUserResponse);
-    console.log(selectedUserDetails);
-    await getUserPaymentsAndOrders(getSelectedUserResponse);
-  }
+
 
   const getUserPaymentsAndOrders = async (user) => {
     try {
@@ -63,7 +53,7 @@ const UserDetails = (props) => {
             })
           }
         });
-        setSelectedUserDetails({
+        setUser({
           ...user,
           ...tempUser,
           payments: responses[1]
@@ -89,19 +79,24 @@ const UserDetails = (props) => {
 
 useEffect(() => {
   setLoading(true);
-  const getter = async () => {
-    // setPending(true);
-    await getUserDetails();
+  const getUserDetails = async () => {
+    const getSelectedUserResponse = await API.get(
+        `/db/users/${userId}`
+    );
+    console.log(getSelectedUserResponse);
+    
+    setUser(getSelectedUserResponse);
+    // console.log(selectedUserDetails);
+    // await getUserPaymentsAndOrders(getSelectedUserResponse);
     setLoading(false);
-    // setPending(false);
   }
-  getter();
-}, [selectedDate]);
+  getUserDetails();
+}, [userId]);
   const ChartUsages = () => {
     try {
-      if(!selectedUserDetails.services.length) return;
+      if(!user.services.length) return;
 
-      const chartUsagesArray = selectedUserDetails.services.sort((service1, service2) =>
+      const chartUsagesArray = user.services.sort((service1, service2) =>
         service1.quantity < service2.quantity ? 1 : -1
       );
       
@@ -155,9 +150,9 @@ useEffect(() => {
   };
   const ChartSpents = () => {
     try {
-      if(!selectedUserDetails.services.length) return;
+      if(!user.services.length) return;
       
-      const chartSpentsArray = selectedUserDetails.services.sort(
+      const chartSpentsArray = user.services.sort(
         (service1, service2) => (service1.spent < service2.spent ? 1 : -1)
       );
   
@@ -211,7 +206,7 @@ useEffect(() => {
   };
 
   const ChartTotalUsagesTimeAxis = () => {
-    let data = selectedUserDetails.payments.map(payment => {
+    let data = user.payments.map(payment => {
         return [moment(payment.created).valueOf(), Number(payment.Amount)]
     }).sort((a,b) => a[0] > b[0] ? 1 : -1);
     console.log(data);
@@ -376,6 +371,13 @@ useEffect(() => {
     return <LoadingIndicator />;
   }
 
+  if (!user) return (
+    <>
+      <BackButton />
+      <h4 className="text-center">Hatalı Kullanıcı</h4>
+    </>
+  )
+
   return (
     <>
       <BackButton />
@@ -392,7 +394,7 @@ useEffect(() => {
       <Datatable
         title="Harcama yaptığı servisler"
         columns={columns}
-        data={selectedUserDetails.services}
+        data={user.services}
         pagination
         responsive
       />
