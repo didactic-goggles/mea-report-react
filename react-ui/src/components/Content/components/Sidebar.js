@@ -55,7 +55,7 @@ export default function Sidebar() {
                             <li>
                             <NavLink to="/users" activeClassName="mm-active">
                                 <FaUserFriends />
-                                    Kullanıcı Detayları</NavLink>
+                                    Kullanıcılar</NavLink>
                             </li>
                             <li className="app-sidebar__heading">Ödemeler</li>
                             <li>
@@ -67,7 +67,13 @@ export default function Sidebar() {
                             <li>
                                 <NavLink to="/services" activeClassName="mm-active">
                                     <MdShare />
-                                    Servis Detayları
+                                    Servisler
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/providers" activeClassName="mm-active">
+                                    <MdShare />
+                                    Sağlayıcılar
                                 </NavLink>
                             </li>
                             <li className="app-sidebar__heading">Sistem</li>

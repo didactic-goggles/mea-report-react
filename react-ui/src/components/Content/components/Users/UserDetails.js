@@ -374,7 +374,7 @@ useEffect(() => {
   if (!user) return (
     <>
       <BackButton />
-      <h4 className="text-center">Hatalı Kullanıcı</h4>
+      <h4 className="text-center">Kullanıcı Verisi Bulunamadı</h4>
     </>
   )
 

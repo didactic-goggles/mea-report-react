@@ -1,12 +1,10 @@
 class Service {
   constructor(
-    id,
-    name,
-    provider,
+    item,
   ) {
-    this.id = id;
-    this.name = name;
-    this.prv = provider;
+    this.id = item.id;
+    this.n = item.name;
+    this.prv = item.provider;
   }
 }
 

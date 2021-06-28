@@ -18,3 +18,10 @@ gibi bir ekran cıkarıp orda bu detaylı verebilir.
 Bu payment listesindeki ödeme yapan kişilerin çoktan aza doğru da sıralanıyor olması gerekmekte
 
 yani ben gireyim , x kişinin paymentlarını görüntülerken altta x kişisinin siparişleri seçeneği olsun ona tıkladıgımda da o adamın siparişleri açılsın o siparişlerin içinden de servise tıkladıgında servisin detayı gelsin vs
+
+
+
+servisler 
+    çoktan aza doğru toplam alınan order sayısı
+    toplam charge ı
+    toplam profit

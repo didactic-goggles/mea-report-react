@@ -1,97 +1,96 @@
-import React, { useEffect, useState } from "react";
-import { useRouteMatch, Route, Switch, useHistory } from "react-router-dom";
-import Datatable from "react-data-table-component";
-import API from "../../../../api";
-import ServiceDetails from "./ServiceDetails";
-import LoadingIndicator from "../../../UI/LoadingIndicator";
+import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import Datatable from 'react-data-table-component';
+import { Button } from 'rsuite';
+import moment from 'moment';
+import API from '../../../../api';
+import LoadingIndicator from '../../../UI/LoadingIndicator';
 
 const Services = () => {
-  console.log("Rendering => Services");
+  console.log('Rendering => Services');
   let history = useHistory();
-  let { path } = useRouteMatch();
   const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [services, setServices] = useState([]);
-  const [selectedService, setSelectedService] = useState("");
-  const getServices = async () => {
-    const getServicesResponse = await API.get(`/db/services`);
-    console.log(getServicesResponse);
-    setServices(getServicesResponse);
-  };
-
-  const columns = React.useMemo(() => [
+  const [serviceCalculation, setServiceCalculation] = useState(null);
+  const columns = [
     {
-      name: "ID",
-      selector: "id",
+      name: 'ID',
+      selector: 'id',
       sortable: true,
-      width: "80px",
+      width: '80px',
     },
     {
-      name: "Servis Adı",
-      selector: "name",
+      name: 'Servis Adı',
+      selector: 'n',
       sortable: true,
-      cell: row => {
-      return <div data-tag="allowRowEvents">{row.name}</div>
-      }
+      cell: (row) => {
+        return <div data-tag="allowRowEvents">{row.n}</div>;
+      },
     },
     {
-      name: "Sağlayıcı",
-      selector: "prvd",
+      name: 'Sağlayıcı',
+      selector: 'prv',
       sortable: true,
-      maxWidth: '250px'
+      maxWidth: '250px',
     },
-  ]);
+  ];
 
   useEffect(() => {
-    setLoading(true);
-    const getter = async () => {
-      await getServices();
+    const getServices = async () => {
+      setLoading(true);
+      const getServicesResponse = await API.get(`/db/services`);
+      setServices(getServicesResponse);
       setLoading(false);
     };
-    getter();
+    getServices();
   }, []);
 
-  if (loading) {
-    return <LoadingIndicator />;
-  }
+  if (loading) return <LoadingIndicator />;
+
   return (
     <>
-      <Switch>
-        <Route exact path={path}>
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="mb-3 card">
-                <div class="card-body">
-                  <Datatable
-                    title="Servisler"
-                    columns={columns}
-                    data={services}
-                    pagination
-                    responsive={true}
-                    striped={true}
-                    highlightOnHover={true}
-                    pointerOnHover={true}
-                    onRowClicked={(event) => {
-                      setSelectedService(event);
-                      history.push(`/services/${event.id}`);
-                    }}
-                  />
-                </div>
-              </div>
+      <div className="row">
+        <div className="col-lg-12">
+          <div className="mb-3 card card-body">
+            <div className="d-flex justify-content-end mb-2">
+              <Button
+                appearance="primary"
+                loading={buttonLoading}
+                onClick={() => {
+                  setButtonLoading(true);
+                  setTimeout(() => {
+                    setButtonLoading(false);
+                  }, 1500);
+                }}
+              >
+                Servis Kullanımlarını Hesapla
+              </Button>
             </div>
-          </div>
-        </Route>
-        <Route path={`${path}/:id`}>
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="mb-3 card">
-                <div class="card-body">
-                  <ServiceDetails selectedService={selectedService} />
-                </div>
+            {serviceCalculation && (
+              <div className="d-flex justify-content-end">
+                <span class="text-muted">
+                  Son hesaplanma zamanı:{' '}
+                  {moment(serviceCalculation.c * 1000).format('DD/MM/YYYY')}
+                </span>
               </div>
-            </div>
+            )}
+            <Datatable
+              title="Servisler"
+              columns={columns}
+              data={services}
+              pagination
+              responsive={true}
+              striped={true}
+              highlightOnHover={true}
+              pointerOnHover={true}
+              onRowClicked={(event) => {
+                history.push(`/service/${event.id}`);
+              }}
+            />
           </div>
-        </Route>
-      </Switch>
+        </div>
+      </div>
     </>
   );
 };

@@ -1,77 +1,108 @@
 // import Axios from "axios";
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import moment from "moment";
-import API from "../../../../api";
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import moment from 'moment';
+import API from '../../../../api';
 // import Chart from "react-apexcharts";
 // import ApexCharts from 'apexcharts';
-import Datatable from "react-data-table-component";
+import Datatable from 'react-data-table-component';
 import Card from '../../../UI/Card';
 import DateRangePicker from '../../../UI/DateRangePicker';
 import BackButton from '../../../UI/BackButton';
-import LoadingIndicator from "../../../UI/LoadingIndicator";
+import LoadingIndicator from '../../../UI/LoadingIndicator';
 
-const ServiceDetails = (props) => {
-  console.log("Rendering => PaymentDetails");
+const ServiceDetails = () => {
+  console.log('Rendering => PaymentDetails');
   // let history = useHistory();
-  let { selectedService } = props;
-  let { id } = useParams();
+  // let { selectedService } = props;
+  let { serviceId } = useParams();
 
   const [allOrdersOfService, setAllOrdersOfService] = useState([]);
   const [allUsersOfService, setAllUsersOfService] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [serviceDetails, setServiceDetails] = useState();
-  const [filteredAllOrdersOfService, setFilteredAllOrdersOfService] = useState([]);
-  console.log(selectedService);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [service, setService] = useState();
+  const [filteredAllOrdersOfService, setFilteredAllOrdersOfService] = useState(
+    []
+  );
+  // console.log(selectedService);
   const [selectedDate, setSelectedDate] = useState({
-    startDate: moment().subtract(7, "days").unix(),
+    startDate: moment().subtract(7, 'days').unix(),
     endDate: moment().unix(),
   });
 
-  console.log(selectedDate);
+  // Get Service Details
+  useEffect(() => {
+    const getService = async () => {
+      setLoading(true);
+      const getService = await API.get(`/db/services/${serviceId}`);
+      setService(getService);
+      setLoading(false);
+    };
+    getService();
+  }, [serviceId]);
 
-  const getOrders = async () => {
-    const tempOrders = [];
-    const getOrdersResponse = await API.get(`/db/orders?service_id=${id}&created_gte=${selectedDate.startDate}&created_lte=${selectedDate.endDate}`);
-    tempOrders.push(...getOrdersResponse);
-    if (!selectedService) {
-      const getServideDetails = await API.get(`/db/services/${id}`);
-      selectedService = getServideDetails;
-    }
-    const tempAllOrdersOfService = tempOrders.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id)) ===i);
-    setAllOrdersOfService(tempAllOrdersOfService);
+  // Get Orders Of Service
 
-    setOrders(tempAllOrdersOfService);
-  };
-
-  const setOrders = (orders) => {
-    
-    setFilteredAllOrdersOfService(orders);
-    let tempUsersOfService = [];
-    // console.log(tempAllOrdersOfService);
-    const tempServiceDetails = {
-        quantity: 0,
-        amount: 0
-    }
-    orders.forEach(order => {
+  useEffect(() => {
+    const getOrders = async () => {
+      setDetailsLoading(true);
+      const orders = await API.get(
+        `/db/orders?service_id=${serviceId}&d_gte=${selectedDate.startDate}&d_lte=${selectedDate.endDate}`
+      );
+      setAllOrdersOfService(orders);
+      const users = [];
+      orders.forEach((order) => {
         // console.log(order);
-        const userOrderIndex = tempUsersOfService.findIndex(user => user.user === order.user);
-        tempServiceDetails.quantity += 1;
-        tempServiceDetails.amount += Number(order.charge);
-        if( userOrderIndex === -1) {
-            tempUsersOfService.push({
-                user: order.user,
-                quantity: 1,
-                amount: Number(order.charge)
-            })
+        const userOrderIndex = users.findIndex(
+          (user) => user.user === order.u
+        );
+        if (userOrderIndex === -1) {
+          users.push({
+            user: order.u,
+            quantity: 1,
+            amount: Number(order.chg),
+          });
         } else {
-            tempUsersOfService[userOrderIndex].quantity += 1;
-            tempUsersOfService[userOrderIndex].amount += Number(order.charge);
+          users[userOrderIndex].quantity += 1;
+          users[userOrderIndex].amount += Number(order.chg);
         }
-    });
-    setAllUsersOfService(tempUsersOfService);
-    setServiceDetails(tempServiceDetails);
-  }
+      });
+      setAllUsersOfService(users);
+      console.log(users);
+      setDetailsLoading(false);
+    };
+    getOrders();
+  }, [selectedDate, serviceId]);
+
+  // const setOrders = (orders) => {
+
+  //   setFilteredAllOrdersOfService(orders);
+  //   let tempUsersOfService = [];
+  //   // console.log(tempAllOrdersOfService);
+  //   const tempServiceDetails = {
+  //       quantity: 0,
+  //       amount: 0
+  //   }
+  //   orders.forEach(order => {
+  //       // console.log(order);
+  //       const userOrderIndex = tempUsersOfService.findIndex(user => user.user === order.user);
+  //       tempServiceDetails.quantity += 1;
+  //       tempServiceDetails.amount += Number(order.charge);
+  //       if( userOrderIndex === -1) {
+  //           tempUsersOfService.push({
+  //               user: order.user,
+  //               quantity: 1,
+  //               amount: Number(order.charge)
+  //           })
+  //       } else {
+  //           tempUsersOfService[userOrderIndex].quantity += 1;
+  //           tempUsersOfService[userOrderIndex].amount += Number(order.charge);
+  //       }
+  //   });
+  //   setAllUsersOfService(tempUsersOfService);
+  //   setServiceDetails(tempServiceDetails);
+  // }
 
   // useEffect(() => {
   //   setLoading(true);
@@ -83,17 +114,17 @@ const ServiceDetails = (props) => {
   //   getter();
   // }, []);
 
-  useEffect(() => {
-    setLoading(true);
-    const getter = async () => {
-      await getOrders();
-      setLoading(false);
-    };
-    getter();
-  }, [selectedDate]);
+  // useEffect(() => {
+  //   setLoading(true);
+  //   const getter = async () => {
+  //     await getOrders();
+  //     setLoading(false);
+  //   };
+  //   getter();
+  // }, [selectedDate]);
 
   // useEffect(() => {
-  //   const tempArray = allOrdersOfService.filter(order => 
+  //   const tempArray = allOrdersOfService.filter(order =>
   //     moment(order.created).isBetween(moment(selectedDate[0].startDate), moment(selectedDate[0].endDate))
   //   )
   //   console.log(allOrdersOfService);
@@ -119,66 +150,100 @@ const ServiceDetails = (props) => {
 
   const columnsForOrders = React.useMemo(() => [
     {
-      name: "ID",
-      selector: "id",
+      name: 'ID',
+      selector: 'id',
       sortable: true,
-      maxWidth: "120px",
+      maxWidth: '120px',
     },
     {
-      name: "Kullanıcı",
-      selector: "name",
+      name: 'Kullanıcı',
+      selector: 'u',
       sortable: true,
       cell: (row) => {
-        return <div>{row.user}</div>;
+        return (
+          <div>
+            <Link to={`/user/${row.u}`}>{row.u}</Link>
+          </div>
+        );
       },
     },
     {
-        name: "Link",
-        selector: "link",
-        sortable: true,
-        cell: (row) => {
-          return <a href={row.link}>{row.link}</a>;
-        },
-      },
-    {
-      name: "Tarih",
-      selector: "created",
+      name: 'Tarih',
+      selector: 'd',
       sortable: true,
-      cell: (row) => <span>{moment(row.created * 1000).format('DD/MM/YYYY')}</span>
+      cell: (row) => <span>{moment(row.d * 1000).format('DD/MM/YYYY')}</span>,
     },
   ]);
 
   const columnsForUsers = React.useMemo(() => [
     {
-      name: "Kullanıcı",
-      selector: "user",
-      sortable: true
+      name: 'Kullanıcı',
+      selector: 'user',
+      sortable: true,
     },
     {
-        name: "Toplam Sipariş",
-        selector: "qt",
-        sortable: true
-      },
-      {
-        name: "Toplam Tutar",
-        selector: "amount",
-        sortable: true
-      }
+      name: 'Toplam Sipariş',
+      selector: 'quantity',
+      sortable: true,
+    },
+    {
+      name: 'Toplam Tutar',
+      selector: 'amount',
+      sortable: true,
+    },
   ]);
 
   if (loading) {
     return <LoadingIndicator />;
   }
+
+  if (!service) {
+    return (
+      <>
+        <BackButton />
+        <h4 className="text-center">Servis Verisi Bulunamadı</h4>
+      </>
+    );
+  }
+
+  const Details = () => {
+    if (detailsLoading) return <LoadingIndicator />;
+    return (
+      <>
+        <Filters />
+        <div className="mb-3">
+          <Datatable
+            title={`${service.id} ID'li Servisin Siparişleri`}
+            columns={columnsForOrders}
+            data={allOrdersOfService}
+            pagination
+          />
+        </div>
+        <div className="mb-3">
+          <Datatable
+            title={`Servisi en çok kullananlar`}
+            columns={columnsForUsers}
+            data={allUsersOfService}
+            pagination
+            defaultSortField="quantity"
+            defaultSortAsc={false}
+          />
+        </div>
+      </>
+    );
+  };
+
   return (
     <>
       <BackButton />
+      <div>{service.n}</div>
       {/* <div>
             <TotalUsagesGraphic />
         </div>
         <div>
             <TotalUsagesTimeAxisGraphic />
         </div> */}
-      <div className="row mb-3">
+      {/* <div className="row mb-3">
             {serviceDetails.qt ? 
                 <div className="col-md-6 col-xl-4">
                     <Card variant="bg-midnight-bloom" details={{number: serviceDetails.qt, title: 'Bu dönemki toplam sipariş adedi'}} />
@@ -189,26 +254,8 @@ const ServiceDetails = (props) => {
                     <Card variant="bg-arielle-smile" details={{number: serviceDetails.amount.toFixed(2), title: 'Bu dönemki toplam tutar'}} />
                 </div>
             : null}
-      </div>
-      <Filters />
-      <div className="mb-3">
-        <Datatable
-            title={`${selectedService.id} ID'li Servisin Siparişleri`}
-            columns={columnsForOrders}
-            data={filteredAllOrdersOfService}
-            pagination
-        />
-      </div>
-      <div className="mb-3">
-        <Datatable
-            title={`Servisi en çok kullananlar`}
-            columns={columnsForUsers}
-            data={allUsersOfService}
-            pagination
-            defaultSortField="quantity"
-            defaultSortAsc={false}
-        />
-      </div>
+      </div> */}
+      <Details />
     </>
   );
 };

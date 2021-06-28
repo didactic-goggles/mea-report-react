@@ -17,16 +17,7 @@ export const addNewJob = createAsyncThunk(
   'jobs/addNewJob',
   async (job, ThunkAPI) => {
     function fetchItemToServer(item) {
-      //     console.log(job)
-      //   setTimeout(() => {
-      //     // const state1 = ThunkAPI.getState();
-      //     ThunkAPI.dispatch(
-      //       updateJob({
-      //         id: job.id,
-      //       })
-      //     );
-      //   }, 100);
-      //   return 1;
+      // console.log(job, item);
       return client.post(job.url, item).then(() => {
         ThunkAPI.dispatch(
           updateJob({

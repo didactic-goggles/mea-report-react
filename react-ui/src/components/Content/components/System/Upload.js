@@ -21,14 +21,19 @@ const Upload = () => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const submitHandler = async (event) => {
     event.preventDefault();
-    setIsFileUploading(true);
     try {
       // const config = {
-      //     onUploadProgress: function (progressEvent) {
-      //         console.log(Math.round((progressEvent.loaded * 100) / progressEvent.total))
-      //         setFileUplaodProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
-      //     }
-      // }
+        //     onUploadProgress: function (progressEvent) {
+          //         console.log(Math.round((progressEvent.loaded * 100) / progressEvent.total))
+          //         setFileUplaodProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+          //     }
+          // }
+      if (uploadedFiles.length === 0) {
+        Alert.error('Lütfen dosya seç', 3000);
+        return;
+      }
+      setIsFileUploading(true);
+      const services = [];
       uploadedFiles.forEach(async (uploadedFile, index) => {
         console.log(uploadedFile);
         const id = moment().unix() + index;
@@ -39,16 +44,22 @@ const Upload = () => {
           let formattedItem;
           switch (uploadedFile.fileType) {
             case 'orders':
-              formattedItem = new Order(...Object.values(item));
+              formattedItem = new Order(item);
+              const serviceItem = new Service({
+                id: item.service_id,
+                name: item.service_name,
+                provider: item.Provider
+              });
+              services.push(serviceItem);
               break;
             case 'payments':
-              formattedItem = new Payment(...Object.values(item));
+              formattedItem = new Payment(item);
               break;
-            case 'services':
-              formattedItem = new Service(...Object.values(item));
-              break;
+            // case 'services':
+            //   formattedItem = new Service(...Object.values(item));
+            //   break;
             case 'users':
-              formattedItem = new User(...Object.values(item));
+              formattedItem = new User(item);
               break;
             default:
               break;
@@ -68,6 +79,18 @@ const Upload = () => {
             fileTypeTR: uploadedFile.fileTypeTR
           })
         );
+        if (services.length > 0) {
+          await dispatch(
+            addNewJob({
+              url: `db/services`,
+              items: services.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i),
+              name: 'services',
+              id: id+1,
+              fileType: 'services',
+              fileTypeTR: 'Siparişler'
+            })
+          );
+        }
       });
 
       // dispatch(
@@ -116,8 +139,8 @@ const Upload = () => {
         ? 'Ödeme'
         : fileType === 'users'
         ? 'Kullanıcı'
-        : fileType === 'services'
-        ? 'Servis'
+        // : fileType === 'services'
+        // ? 'Servis'
         : 'Tanımsız';
     console.log(convertedFileType);
     const selectedFiles = files.filter((file) => !file.fileType);
@@ -183,7 +206,7 @@ const Upload = () => {
               <option value="orders">Sipariş</option>
               <option value="payments">Ödeme</option>
               <option value="users">Kullanıcılar</option>
-              <option value="services">Servisler</option>
+              {/* <option value="services">Servisler</option> */}
             </Form.Control>
           </Form.Group>
           <Uploader
