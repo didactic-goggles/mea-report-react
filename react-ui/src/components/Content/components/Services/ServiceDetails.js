@@ -22,10 +22,7 @@ const ServiceDetails = () => {
   const [loading, setLoading] = useState(true);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [service, setService] = useState();
-  const [filteredAllOrdersOfService, setFilteredAllOrdersOfService] = useState(
-    []
-  );
-  // console.log(selectedService);
+
   const [selectedDate, setSelectedDate] = useState({
     startDate: moment().subtract(7, 'days').unix(),
     endDate: moment().unix(),
@@ -43,7 +40,6 @@ const ServiceDetails = () => {
   }, [serviceId]);
 
   // Get Orders Of Service
-
   useEffect(() => {
     const getOrders = async () => {
       setDetailsLoading(true);
@@ -74,70 +70,6 @@ const ServiceDetails = () => {
     };
     getOrders();
   }, [selectedDate, serviceId]);
-
-  // const setOrders = (orders) => {
-
-  //   setFilteredAllOrdersOfService(orders);
-  //   let tempUsersOfService = [];
-  //   // console.log(tempAllOrdersOfService);
-  //   const tempServiceDetails = {
-  //       quantity: 0,
-  //       amount: 0
-  //   }
-  //   orders.forEach(order => {
-  //       // console.log(order);
-  //       const userOrderIndex = tempUsersOfService.findIndex(user => user.user === order.user);
-  //       tempServiceDetails.quantity += 1;
-  //       tempServiceDetails.amount += Number(order.charge);
-  //       if( userOrderIndex === -1) {
-  //           tempUsersOfService.push({
-  //               user: order.user,
-  //               quantity: 1,
-  //               amount: Number(order.charge)
-  //           })
-  //       } else {
-  //           tempUsersOfService[userOrderIndex].quantity += 1;
-  //           tempUsersOfService[userOrderIndex].amount += Number(order.charge);
-  //       }
-  //   });
-  //   setAllUsersOfService(tempUsersOfService);
-  //   setServiceDetails(tempServiceDetails);
-  // }
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   const getter = async () => {
-  //     await getOrders();
-  //     initDatatables();
-  //     setLoading(false);
-  //   };
-  //   getter();
-  // }, []);
-
-  // useEffect(() => {
-  //   setLoading(true);
-  //   const getter = async () => {
-  //     await getOrders();
-  //     setLoading(false);
-  //   };
-  //   getter();
-  // }, [selectedDate]);
-
-  // useEffect(() => {
-  //   const tempArray = allOrdersOfService.filter(order =>
-  //     moment(order.created).isBetween(moment(selectedDate[0].startDate), moment(selectedDate[0].endDate))
-  //   )
-  //   console.log(allOrdersOfService);
-  //   console.log(tempArray);
-  //   setOrders(tempArray);
-  //   // setTotalPaymentDetails(tempTotalPaymentObject);
-  //   // // const filteredPaymentsByDate = userPayments.filter(payment =>
-  //   // //     moment(payment.Created).isBetween(moment(selectedDate[0].startDate), moment(selectedDate[0].endDate), null, "(]")
-  //   // // );
-  //   // // setUserPayments(filteredPaymentsByDate)
-  //   // // console.log(filteredPaymentsByDate);
-  //   // setUserPayments(tempArray)
-  // }, [selectedDate]);
 
   const Filters = () => (
     <div className="d-flex justify-content-end mb-3">
