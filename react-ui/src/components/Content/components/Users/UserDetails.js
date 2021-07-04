@@ -26,6 +26,7 @@ const UserDetails = (props) => {
     try {
       console.log(userDetails);
       if (!userDetails) return;
+      setLoading(true);
       const urls = [
         `/db/orders?u=${userDetails.u}&d_gte=${selectedDate.startDate}&d_lte=${selectedDate.endDate}`,
         `/db/payments?u=${userDetails.u}&c_gte=${selectedDate.startDate}&c_lte=${selectedDate.endDate}`,
@@ -75,6 +76,7 @@ const UserDetails = (props) => {
       );
       await Promise.all(servicesPromises);
       console.log(services);
+      setUserOrders(responses[0]);
       setUserServices(services);
       // setUser({
       //   ...user,
@@ -83,8 +85,8 @@ const UserDetails = (props) => {
       // })
     } catch (error) {
       console.log(error);
-      // setLoading(false);
     }
+    setLoading(false);
     // console.log()
   };
 
@@ -431,7 +433,23 @@ const UserDetails = (props) => {
   return (
     <>
       <BackButton />
-      <div>{user.u}</div>
+      <div className="row">
+        <div className="col-12">
+          <div className="card mb-3 widget-content">
+            <div className="widget-content-outer">
+              <div className="widget-content-wrapper">
+                <div className="widget-content-left">
+                  <div className="widget-heading">{user.u}</div>
+                  <div className="widget-subheading">Kullanıcıya ait seçtiğin aralıktaki toplam sipariş</div>
+                </div>
+                <div className="widget-content-right">
+                  <div className="widget-numbers text-success">{userOrders.length}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="row mb-3">
         <div className="col-lg-6">{ChartSpents()}</div>
         <div className="col-lg-6">{ChartUsages()}</div>

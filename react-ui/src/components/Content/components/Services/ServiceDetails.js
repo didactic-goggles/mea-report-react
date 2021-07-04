@@ -172,7 +172,23 @@ const ServiceDetails = () => {
   return (
     <>
       <BackButton />
-      <div>{service.n}</div>
+      <div className="row">
+        <div className="col-12">
+          <div className="card mb-3 widget-content">
+            <div className="widget-content-outer">
+              <div className="widget-content-wrapper">
+                <div className="widget-content-left">
+                  <div className="widget-heading">{service.n}</div>
+                  <div className="widget-subheading">Servise ait seçtiğin aralıktaki toplam sipariş</div>
+                </div>
+                <div className="widget-content-right">
+                  <div className="widget-numbers text-success">{allOrdersOfService.length}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       {/* <div>
             <TotalUsagesGraphic />
         </div>
