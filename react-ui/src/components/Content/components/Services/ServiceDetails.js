@@ -1,19 +1,19 @@
 // import Axios from "axios";
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import moment from 'moment';
 import API from '../../../../api';
 // import Chart from "react-apexcharts";
 // import ApexCharts from 'apexcharts';
 import Datatable from 'react-data-table-component';
-import Card from '../../../UI/Card';
+// import Card from '../../../UI/Card';
 import DateRangePicker from '../../../UI/DateRangePicker';
 import BackButton from '../../../UI/BackButton';
 import LoadingIndicator from '../../../UI/LoadingIndicator';
 
 const ServiceDetails = () => {
   console.log('Rendering => PaymentDetails');
-  // let history = useHistory();
+  let history = useHistory();
   // let { selectedService } = props;
   let { serviceId } = useParams();
 
@@ -48,7 +48,7 @@ const ServiceDetails = () => {
     const getOrders = async () => {
       setDetailsLoading(true);
       const orders = await API.get(
-        `/db/orders?service_id=${serviceId}&d_gte=${selectedDate.startDate}&d_lte=${selectedDate.endDate}`
+        `/db/orders?sid=${serviceId}&d_gte=${selectedDate.startDate}&d_lte=${selectedDate.endDate}`
       );
       setAllOrdersOfService(orders);
       const users = [];
@@ -148,7 +148,7 @@ const ServiceDetails = () => {
     </div>
   );
 
-  const columnsForOrders = React.useMemo(() => [
+  const columnsForOrders = [
     {
       name: 'ID',
       selector: 'id',
@@ -162,7 +162,11 @@ const ServiceDetails = () => {
       cell: (row) => {
         return (
           <div>
-            <Link to={`/user/${row.u}`}>{row.u}</Link>
+            <a href={`/user/${row.u}`} onClick={async (e) => {
+              e.preventDefault();
+              const getUserIdFromName = await API.get(`/db/users?u=${row.u}`);
+              history.push(`/user/${getUserIdFromName[0].id}`);
+            }}>{row.u}</a>
           </div>
         );
       },
@@ -173,9 +177,9 @@ const ServiceDetails = () => {
       sortable: true,
       cell: (row) => <span>{moment(row.d * 1000).format('DD/MM/YYYY')}</span>,
     },
-  ]);
+  ];
 
-  const columnsForUsers = React.useMemo(() => [
+  const columnsForUsers = [
     {
       name: 'Kullanıcı',
       selector: 'user',
@@ -191,7 +195,7 @@ const ServiceDetails = () => {
       selector: 'amount',
       sortable: true,
     },
-  ]);
+  ];
 
   if (loading) {
     return <LoadingIndicator />;

@@ -1,5 +1,5 @@
-import axios from "axios";
-import { Alert } from "rsuite";
+import axios from 'axios';
+import { Alert } from 'rsuite';
 
 Alert.config({ top: 50 });
 
@@ -12,7 +12,7 @@ defaultInstance.interceptors.response.use(
     return response.data;
   },
   (err) => {
-    showError("Bir hata oluştu");
+    showError('Bir hata oluştu');
     Promise.reject(err.response ? err.response.data.message : err);
   }
 );

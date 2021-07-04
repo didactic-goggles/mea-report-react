@@ -70,12 +70,6 @@ export default function Sidebar() {
                                     Servisler
                                 </NavLink>
                             </li>
-                            <li>
-                                <NavLink to="/providers" activeClassName="mm-active">
-                                    <MdShare />
-                                    Sağlayıcılar
-                                </NavLink>
-                            </li>
                             <li className="app-sidebar__heading">Sistem</li>
                             <li>
                                 <NavLink to="/upload" activeClassName="mm-active">

@@ -24,7 +24,7 @@ const UserDetails = (props) => {
   const getUserPaymentsAndOrders = async (user) => {
     try {
       if(user.user) {
-        const urls = [`/db/orders?user=${user.user}&created_gte=${selectedDate.startDate}&created_lte=${selectedDate.endDate}`, `/db/payments?user=${user.user}&created_gte=${selectedDate.startDate}&created_lte=${selectedDate.endDate}`];
+        const urls = [`/db/orders?u=${user.user}&c_gte=${selectedDate.startDate}&c_lte=${selectedDate.endDate}`, `/db/payments?user=${user.user}&created_gte=${selectedDate.startDate}&created_lte=${selectedDate.endDate}`];
         var promises = urls.map(url => API.get(url));
         const responses = await Promise.all(promises);
         // console.log(responses);
@@ -39,15 +39,14 @@ const UserDetails = (props) => {
         responses[0].forEach((order) => {
           tempUser.spent += Number(order.cost);
           tempUser.quantity += 1;
-          const isExistingServiceInUserSpendings = tempUser.services.findIndex(service => service.id === order.s_id)
+          const isExistingServiceInUserSpendings = tempUser.services.findIndex(service => service.id === order.sid)
           if(isExistingServiceInUserSpendings !== -1) {
             const updatedServiceSpent = tempUser.services[isExistingServiceInUserSpendings].spent + Number(order.cost)
             tempUser.services[isExistingServiceInUserSpendings].quantity += 1;
             tempUser.services[isExistingServiceInUserSpendings].spent = updatedServiceSpent;
           } else {
             tempUser.services.push({
-              id: order.s_id,
-              name: order.s_name,
+              id: order.sid,
               quantity: 1,
               spent: Number(order.cost)
             })
@@ -305,7 +304,7 @@ useEffect(() => {
   }
     return (
         <div id="chart">
-            <div class="toolbar">
+            <div className="toolbar">
                 <button id="one_month"
                     onClick={()=>updateData('one_month')} className={ (graphicState.selection ==='one_month' ? 'active' : '')}>
                     1 Ay
@@ -381,6 +380,9 @@ useEffect(() => {
   return (
     <>
       <BackButton />
+      <div>
+        {user.u}
+      </div>
       <div className="row mb-3">
         <div className="col-lg-6">{ChartSpents()}</div>
         <div className="col-lg-6">{ChartUsages()}</div>

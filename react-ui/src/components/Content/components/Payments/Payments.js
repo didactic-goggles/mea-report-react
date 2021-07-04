@@ -29,7 +29,7 @@ const Payments = () => {
     // setPending(false);
   };
 
-  const columns = React.useMemo(() => [
+  const columns = [
     {
       name: "Ad",
       selector: "user",
@@ -45,7 +45,7 @@ const Payments = () => {
       selector: "amount",
       sortable: true,
     },
-  ]);
+  ];
 
   // useEffect(() => {
   //   setLoading(true);

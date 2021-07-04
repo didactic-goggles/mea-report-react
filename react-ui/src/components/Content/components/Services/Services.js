@@ -62,7 +62,7 @@ const Services = () => {
 
   useEffect(() => {
     if (serviceCalculation && visibleColumns.length === 3) {
-      setVisibleColumns([...visibleColumns, {
+      setVisibleColumns(activeColumns => ([...activeColumns, {
         name: 'Toplam Sipariş',
         selector: 'q',
         sortable: true,
@@ -77,15 +77,15 @@ const Services = () => {
         selector: 'cost',
         sortable: true,
         maxWidth: '100px',
-      }]);
+      }]));
       setDatatableDefaultSortField('q');
     }
-  }, [serviceCalculation]);
+  }, [serviceCalculation, visibleColumns.length]);
 
   const calculateServicesStats = async () => {
     setButtonLoading(true);
     const allOrders = await API.get('/db/orders');
-    if (allOrders) {
+    if (allOrders.length > 0) {
       const calculatedServices = {};
       allOrders.forEach(o => {
         if(calculatedServices[o.sid]) {
@@ -134,7 +134,7 @@ const Services = () => {
             </div>
             {serviceCalculation && (
               <div className="d-flex justify-content-end">
-                <span class="text-muted">
+                <span className="text-muted">
                   Son hesaplanma zamanı:{' '}
                   {moment(serviceCalculation.created * 1000).format('DD/MM/YYYY')}
                 </span>

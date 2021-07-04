@@ -1,21 +1,21 @@
-import "react-date-range/dist/styles.css"; // main css file
-import "react-date-range/dist/theme/default.css"; // theme css file
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import moment from "moment";
+import 'react-date-range/dist/styles.css'; // main css file
+import 'react-date-range/dist/theme/default.css'; // theme css file
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import moment from 'moment';
 // import Chart from "react-apexcharts";
 // import ApexCharts from "apexcharts";
-import { Badge } from "react-bootstrap";
-import API from "../../../../api";
-import Datatable from "react-data-table-component";
+import { Badge } from 'react-bootstrap';
+import API from '../../../../api';
+import Datatable from 'react-data-table-component';
 
-import Card from "../../../UI/Card";
-import DateRangePicker from "../../../UI/DateRangePicker";
-import BackButton from "../../../UI/BackButton";
-import LoadingIndicator from "../../../UI/LoadingIndicator";
+import Card from '../../../UI/Card';
+import DateRangePicker from '../../../UI/DateRangePicker';
+import BackButton from '../../../UI/BackButton';
+import LoadingIndicator from '../../../UI/LoadingIndicator';
 
 const PaymentDetails = (props) => {
-  console.log("Rendering => PaymentDetails");
+  console.log('Rendering => PaymentDetails');
   const [selectedPayment, setSelectedPayment] = useState(props.selectedPayment);
   let { id } = useParams();
 
@@ -24,7 +24,7 @@ const PaymentDetails = (props) => {
   const [totalPaymentDetails, setTotalPaymentDetails] = useState();
   console.log(selectedPayment);
   const [selectedDate, setSelectedDate] = useState({
-    startDate: moment().subtract(7, "days").unix(),
+    startDate: moment().subtract(7, 'days').unix(),
     endDate: moment().unix(),
   });
 
@@ -35,28 +35,27 @@ const PaymentDetails = (props) => {
       console.log(id);
       const getSelectedPaymentResponse = await API.get(`/db/payments/${id}`);
       console.log(getSelectedPaymentResponse);
-      if (getSelectedPaymentResponse)
-        setSelectedPayment(getSelectedPaymentResponse);
+      if (getSelectedPaymentResponse) setSelectedPayment(getSelectedPaymentResponse);
     }
-    if(selectedPayment) {
-        const getPaymentsResponse = await API.get(
-          `/db/payments?user=${selectedPayment.user}&Status=completed&created_gte=${selectedDate.startDate}&created_lte=${selectedDate.endDate}`
-        );
+    if (selectedPayment) {
+      const getPaymentsResponse = await API.get(
+        `/db/payments?user=${selectedPayment.user}&Status=completed&created_gte=${selectedDate.startDate}&created_lte=${selectedDate.endDate}`
+      );
 
-        if (getPaymentsResponse) tempPayments.push(...getPaymentsResponse);
-        const tempTotalPaymentObject = {
-          totalPayment: 0,
-          numberOfPayment: 0,
-        };
-        tempPayments.forEach((payment) => {
-          tempTotalPaymentObject.totalPayment += Number(payment.Amount);
-          tempTotalPaymentObject.numberOfPayment++;
-        });
+      if (getPaymentsResponse) tempPayments.push(...getPaymentsResponse);
+      const tempTotalPaymentObject = {
+        totalPayment: 0,
+        numberOfPayment: 0,
+      };
+      tempPayments.forEach((payment) => {
+        tempTotalPaymentObject.totalPayment += Number(payment.Amount);
+        tempTotalPaymentObject.numberOfPayment++;
+      });
 
-        setUserPayments(tempPayments);
-        setTotalPaymentDetails(tempTotalPaymentObject);
+      setUserPayments(tempPayments);
+      setTotalPaymentDetails(tempTotalPaymentObject);
     } else {
-        return false;
+      return false;
     }
   };
 
@@ -71,10 +70,7 @@ const PaymentDetails = (props) => {
 
   const Filters = () => (
     <div className="d-flex justify-content-end mb-3">
-      <DateRangePicker
-        selectedDateHandler={setSelectedDate}
-        selectedDate={selectedDate}
-      />
+      <DateRangePicker selectedDateHandler={setSelectedDate} selectedDate={selectedDate} />
     </div>
   );
 
@@ -252,33 +248,33 @@ const PaymentDetails = (props) => {
   const columns = React.useMemo(
     () => [
       {
-        name: "Metod",
-        selector: "method",
+        name: 'Metod',
+        selector: 'method',
         sortable: true,
       },
       {
-        name: "Tutar",
-        selector: "amount",
+        name: 'Tutar',
+        selector: 'amount',
         sortable: true,
       },
       {
-        name: "Tarih",
-        selector: "created",
+        name: 'Tarih',
+        selector: 'created',
         sortable: true,
-        cell: (row) => moment(row.created * 1000).format("DD/MM/YYYY"),
+        cell: (row) => moment(row.created * 1000).format('DD/MM/YYYY'),
       },
       {
-        name: "Durum",
-        selector: "status",
+        name: 'Durum',
+        selector: 'status',
         sortable: true,
         cell: (row) => {
           let statusObject = {};
-          if (row.status === "Completed") {
-            statusObject.variant = "success";
-            statusObject.text = "Tamamlandı";
-          } else if (row.status === "Pending") {
-            statusObject.variant = "warning";
-            statusObject.text = "Beklemede";
+          if (row.status === 'Completed') {
+            statusObject.variant = 'success';
+            statusObject.text = 'Tamamlandı';
+          } else if (row.status === 'Pending') {
+            statusObject.variant = 'warning';
+            statusObject.text = 'Beklemede';
           }
           return (
             <Badge pill variant={statusObject.variant}>
@@ -291,7 +287,7 @@ const PaymentDetails = (props) => {
     []
   );
   if (loading) {
-    return <LoadingIndicator />
+    return <LoadingIndicator />;
   }
   return (
     <>
@@ -310,7 +306,7 @@ const PaymentDetails = (props) => {
               variant="bg-midnight-bloom"
               details={{
                 number: totalPaymentDetails.totalPayment,
-                title: "Bu dönemki toplam ödeme",
+                title: 'Bu dönemki toplam ödeme',
               }}
             />
           </div>
@@ -321,7 +317,7 @@ const PaymentDetails = (props) => {
               variant="bg-arielle-smile"
               details={{
                 number: totalPaymentDetails.numberOfPayment,
-                title: "Bu dönemki toplam ödeme sayısı",
+                title: 'Bu dönemki toplam ödeme sayısı',
               }}
             />
           </div>

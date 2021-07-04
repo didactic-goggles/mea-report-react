@@ -4,6 +4,7 @@ import Form from 'react-bootstrap/Form';
 import { Row, Col, ProgressBar, Card } from 'react-bootstrap';
 import { Uploader, Alert, Button } from 'rsuite';
 
+import API from '../../../../api';
 import { useDispatch } from 'react-redux';
 import { addNewJob } from '../../../../store/reducers/upload';
 
@@ -23,11 +24,11 @@ const Upload = () => {
     event.preventDefault();
     try {
       // const config = {
-        //     onUploadProgress: function (progressEvent) {
-          //         console.log(Math.round((progressEvent.loaded * 100) / progressEvent.total))
-          //         setFileUplaodProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
-          //     }
-          // }
+      //     onUploadProgress: function (progressEvent) {
+      //         console.log(Math.round((progressEvent.loaded * 100) / progressEvent.total))
+      //         setFileUplaodProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+      //     }
+      // }
       if (uploadedFiles.length === 0) {
         Alert.error('Lütfen dosya seç', 3000);
         return;
@@ -43,32 +44,42 @@ const Upload = () => {
         uploadedJSON.forEach((item) => {
           let formattedItem;
           switch (uploadedFile.fileType) {
-            case 'orders':
+            case 'orders': {
               formattedItem = new Order(item);
               const serviceItem = new Service({
                 id: item.service_id,
                 name: item.service_name,
-                provider: item.Provider
+                provider: item.Provider,
               });
               services.push(serviceItem);
               break;
-            case 'payments':
+            }
+            case 'payments': {
               formattedItem = new Payment(item);
               break;
-            // case 'services':
-            //   formattedItem = new Service(...Object.values(item));
-            //   break;
-            case 'users':
+              // case 'services':
+              //   formattedItem = new Service(...Object.values(item));
+              //   break;
+            }
+            case 'users': {
               formattedItem = new User(item);
               break;
-            default:
+            }
+            default: {
               break;
+            }
           }
           // console.log(formattedItem)
           // promiseArray.push(Axios.post(postURL, formattedItem).then(result => setFileUplaodProgress(Math.round((index/uploadedJSON.length) * 100 ))));
           items.push(formattedItem);
         });
-        console.log(id);
+        API.post('db/files', {
+          n: uploadedFile.file.name,
+          e: uploadedFile.file.name.split('.').pop(),
+          ft: uploadedFile.fileType,
+          c: new Date(),
+          s: uploadedFile.file.blobFile.size,
+        });
         await dispatch(
           addNewJob({
             url,
@@ -76,18 +87,18 @@ const Upload = () => {
             name: uploadedFile.file.name,
             id,
             fileType: uploadedFile.fileType,
-            fileTypeTR: uploadedFile.fileTypeTR
+            fileTypeTR: uploadedFile.fileTypeTR,
           })
         );
         if (services.length > 0) {
           await dispatch(
             addNewJob({
               url: `db/services`,
-              items: services.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i),
+              items: services.filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i),
               name: 'services',
-              id: id+1,
+              id: id + 1,
               fileType: 'services',
-              fileTypeTR: 'Siparişler'
+              fileTypeTR: 'Siparişler',
             })
           );
         }
@@ -99,13 +110,7 @@ const Upload = () => {
       //     items,
       //   })
       // );
-      // Axios.post('db/files', {
-      //   name: formFields.uploadedFile.name,
-      //   ext: formFields.uploadedFile.name.split('.').pop(),
-      //   fileType: formFields.fileType,
-      //   created: new Date,
-      //   size: formFields.uploadedFile.size
-      // });
+
       Alert.success('Dosya Yükleme başarılı', 5000);
       // await Axios.post(postURL, uploadedJSON[0], {
       //   headers:  {
@@ -139,12 +144,14 @@ const Upload = () => {
         ? 'Ödeme'
         : fileType === 'users'
         ? 'Kullanıcı'
-        // : fileType === 'services'
-        // ? 'Servis'
-        : 'Tanımsız';
+        : // : fileType === 'services'
+          // ? 'Servis'
+          'Tanımsız';
     console.log(convertedFileType);
+    console.log(files);
     const selectedFiles = files.filter((file) => !file.fileType);
     // const uploadedFile = files[files.length - 1];
+    console.log(selectedFiles);
     selectedFiles.forEach((uploadedFile, index) => {
       if (uploadedFile.blobFile.type === 'application/json') {
         const tempUploadedFiles = uploadedFiles;
@@ -158,10 +165,7 @@ const Upload = () => {
       }
     });
   };
-  const onFileRemove = (file) =>
-    setUploadedFiles(
-      uploadedFiles.filter((uploadedFile) => uploadedFile.id !== file.id)
-    );
+  const onFileRemove = (file) => setUploadedFiles(uploadedFiles.filter((uploadedFile) => uploadedFile.id !== file.id));
   const readFile = (file) => {
     return new Promise((resolve, reject) => {
       var fr = new FileReader();
@@ -179,10 +183,7 @@ const Upload = () => {
   const FileProgress = () => {
     return (
       <>
-        <ProgressBar
-          now={fileUploadProgress}
-          label={`${fileUploadProgress}%`}
-        />
+        <ProgressBar now={fileUploadProgress} label={`${fileUploadProgress}%`} />
         {/* {fileUploadProgress == 100 ? <h5 className="text-center my-3">Dosya karşıya yüklendi. Kontrol ediliyor...</h5> : ""} */}
       </>
     );
@@ -194,12 +195,7 @@ const Upload = () => {
         <Form onSubmit={(event) => submitHandler(event)}>
           <Form.Group controlId="exampleForm.SelectCustom">
             <Form.Label>Dosya Tipi</Form.Label>
-            <Form.Control
-              as="select"
-              custom
-              defaultValue=""
-              onChange={(event) => setFileType(event.target.value)}
-            >
+            <Form.Control as="select" custom defaultValue="" onChange={(event) => setFileType(event.target.value)}>
               <option disabled value="">
                 Dosya tipi seç
               </option>
@@ -223,7 +219,7 @@ const Upload = () => {
               return (
                 <Card
                   style={{
-                    width: '100%'
+                    width: '100%',
                   }}
                   onClick={() => onFileRemove(fileObject)}
                 >
@@ -242,11 +238,7 @@ const Upload = () => {
             <Button>Dosya Seç</Button>
           </Uploader>
           <div className="d-flex justify-content-end my-3">
-            <Button
-              appearance="primary"
-              type="submit"
-              loading={isFileUploading}
-            >
+            <Button appearance="primary" type="submit" loading={isFileUploading}>
               Başlat
             </Button>
             {/* <Button variant="primary" type="submit">Yükle</Button> */}

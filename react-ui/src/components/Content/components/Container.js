@@ -1,20 +1,17 @@
-import React from "react";
-import {
-  Switch,
-  Route,
-} from "react-router-dom";
+import React from 'react';
+import { Switch, Route } from 'react-router-dom';
 
-import Home from "./Home";
-import Users from "./Users/Users";
-import UserDetails from "./Users/UserDetails";
-import Payments from "./Payments/Payments";
+import Home from './Home';
+import Users from './Users/Users';
+import UserDetails from './Users/UserDetails';
+import Payments from './Payments/Payments';
 import Services from './Services/Services';
 import ServiceDetails from './Services/ServiceDetails';
 import Upload from './System/Upload';
 import Files from './System/Files';
 
 function Container() {
-    console.log('Rendering => Container');
+  console.log('Rendering => Container');
   return (
     <div className="app-main__outer">
       <div className="app-main__inner">

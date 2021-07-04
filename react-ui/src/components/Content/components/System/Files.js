@@ -13,7 +13,7 @@ const Files = () => {
     setFiles(getFilesResponse);
   };
 
-  const columns = React.useMemo(() => [
+  const columns = [
     {
       name: "ID",
       selector: "id",
@@ -22,10 +22,10 @@ const Files = () => {
     },
     {
       name: "Servis Adı",
-      selector: "name",
+      selector: "n",
       sortable: true,
       cell: row => {
-      return <div>{row.name}</div>
+      return <div>{row.n}</div>
       }
     },
     {
@@ -35,30 +35,30 @@ const Files = () => {
       maxWidth: '100px',
       cell: row => {
         let content;
-        if(row.fileType === 'services')
+        if(row.ft === 'services')
           content = 'Servis'
-        else if(row.fileType === 'users')
+        else if(row.ft === 'users')
           content = 'Kullanıcı'
-        else if(row.fileType === 'orders')
+        else if(row.ft === 'orders')
           content = 'Sipariş'
-        else if(row.fileType === 'payments')
+        else if(row.ft === 'payments')
           content = 'Ödeme'
       return <span>{content}</span>
       }
     },
     {
       name: "Uzantı",
-      selector: "ext",
+      selector: "e",
       sortable: true,
       maxWidth: '100px'
     },
     {
       name: "Yükl. Tarihi",
-      selector: "created",
+      selector: "c",
       sortable: true,
       maxWidth: '200px'
     },
-  ]);
+  ];
 
   useEffect(() => {
     setLoading(true);
@@ -74,10 +74,10 @@ const Files = () => {
   }
   return (
     <>
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="mb-3 card">
-                <div class="card-body">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="mb-3 card">
+                <div className="card-body">
                   <Datatable
                     title="Dosyalar"
                     columns={columns}

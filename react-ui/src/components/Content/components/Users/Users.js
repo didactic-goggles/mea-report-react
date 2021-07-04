@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useRouteMatch, Route, Switch, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import Datatable from 'react-data-table-component';
 import { TagPicker } from 'rsuite';
 import API from '../../../../api';
 import moment from 'moment';
-import UserDetails from './UserDetails';
 import LoadingIndicator from '../../../UI/LoadingIndicator';
 
 const Users = () => {
@@ -16,47 +15,40 @@ const Users = () => {
   const [tagValue, setTagValue] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   // const [selectedUser, setSelectedUser] = useState('');
-  const getUsers = async () => {
-    let query = '/db/users';
-    console.log(tagValue);
-    if (tagValue.length > 0)
-      query = '/db/users?' + tagValue.map((user) => `user=${user}&`).join('');
-    const getUsersResponse = await API.get(query);
-    if (!users.length) setUsers(getUsersResponse);
-    if (tagValue.length > 0) setFilteredUsers(getUsersResponse);
-  };
 
-  const columns = React.useMemo(
-    () => [
+  const columns = [
       {
         name: 'Ad',
-        selector: 'user',
+        selector: 'u',
         sortable: true,
       },
       {
         name: 'Bakiye',
-        selector: 'balance',
+        selector: 'b',
         sortable: true,
       },
       {
         name: 'Son Giriş',
-        selector: 'lAuth',
+        selector: 'l',
         sortable: true,
-        cell: (row) => moment(row.lAuth * 1000).format('DD/MM/YYYY'),
+        cell: (row) => moment(row.l * 1000).format('DD/MM/YYYY'),
       },
-    ],
-    []
-  );
+    ];
 
   useEffect(() => {
-    setLoading(true);
-    const getter = async () => {
-      await getUsers();
-      console.log(filteredUsers);
+    const getUsers = async () => {
+      setLoading(true);
+      let query = '/db/users';
+      console.log(tagValue);
+      if (tagValue.length > 0)
+        query = '/db/users?' + tagValue.map((user) => `u=${user}&`).join('');
+      const getUsersResponse = await API.get(query);
+      if (!users.length) setUsers(getUsersResponse);
+      if (tagValue.length > 0) setFilteredUsers(getUsersResponse);
       setLoading(false);
     };
-    getter();
-  }, [tagValue]);
+    getUsers();
+  }, [tagValue, users.length]);
 
   const onChangeHandler = (event) => {
     console.log(event);
@@ -70,8 +62,8 @@ const Users = () => {
           users.length
             ? users.map((user) => {
                 return {
-                  label: user.user,
-                  value: user.user,
+                  label: user.u,
+                  value: user.u,
                 };
               })
             : []
@@ -89,10 +81,10 @@ const Users = () => {
   }
   return (
     <>
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="mb-3 card">
-            <div class="card-body">
+      <div className="row">
+        <div className="col-lg-12">
+          <div className="mb-3 card">
+            <div className="card-body">
               {/* <SubHeaderComponent /> */}
               <Filters />
               <Datatable
