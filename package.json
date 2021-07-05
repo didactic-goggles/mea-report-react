@@ -1,5 +1,5 @@
 {
-  "name": "heroku-cra-node",
+  "name": "mea-report",
   "version": "3.0.0",
   "description": "How to use create-react-app with a custom Node API on Heroku",
   "engines": {
@@ -15,7 +15,9 @@
   ],
   "dependencies": {
     "express": "^4.16.4",
-    "json-server": "^0.16.3"
+    "json-server": "^0.16.3",
+    "open": "^8.2.1",
+    "pkg": "^5.3.0"
   },
   "repository": {
     "type": "git",
@@ -28,5 +30,13 @@
     "react"
   ],
   "license": "MIT",
-  "devDependencies": {}
+  "devDependencies": {},
+  "pkg": {
+    "assets": [
+      "./react-ui/build/**/*"
+    ],
+    "targets": [ "node14-windows-x64", "node14-macos-x64" ],
+    "outputPath": "dist"
+  },
+  "bin": "server/index.js"
 }
