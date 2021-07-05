@@ -25,3 +25,27 @@ servisler
     çoktan aza doğru toplam alınan order sayısı
     toplam charge ı
     toplam profit
+
+
+
+user dosyaı upload etmeden users yaratıcaz
+
+seçilen süreye göre servis kullanımlarıı hesapla
+provider filtresi
+kullanıcı detayını hesapla ve tarih aralığını seçenek
+    kul adı 
+    bakiye
+    toplam harcama
+    toplam sipariş
+    en çok kullandığı servis
+
+kullanıcılar sayfasında servis sayfası seç ve ona ait olan kullanıcılarda arama yapsın sonra detaya gitsin
+günlük harcama grafiği koy
+aynı renkleri kullan
+günlük kullanım 
+bütün servisleri yazsın user detay grafikleri
+en çok harc. servi = harcama
+                    = Sipariş Sayısı (headerlar)
+
+kısayol girişi exe eklenecek
+user detayına bakarken cıkan servis isimlerine tıklandıgında servise gidilebilmeli

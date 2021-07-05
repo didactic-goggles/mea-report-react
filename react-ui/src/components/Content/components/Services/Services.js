@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Datatable from 'react-data-table-component';
-import { Button } from 'rsuite';
+import { Button, TagPicker } from 'rsuite';
 import moment from 'moment';
 import API from '../../../../api';
 import LoadingIndicator from '../../../UI/LoadingIndicator';
@@ -123,7 +123,23 @@ const Services = () => {
       <div className="row">
         <div className="col-lg-12">
           <div className="mb-3 card card-body">
-            <div className="d-flex justify-content-end mb-2">
+            <div className="d-flex justify-content-between mb-2">
+            <TagPicker
+                // data={
+                //   services.length
+                //     ? services.map((user) => {
+                //         return {
+                //           label: user.u,
+                //           value: user.u,
+                //         };
+                //       })
+                //     : []
+                // }
+                style={{ width: 300 }}
+                // onChange={(e) => onChangeHandler(e)}
+                // value={tagValue}
+                placeholder="Sağlayıcı seç"
+              />
               <Button
                 appearance="primary"
                 loading={buttonLoading}
