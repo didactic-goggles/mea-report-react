@@ -1,10 +1,9 @@
 class Service {
-  constructor(
-    item,
-  ) {
-    this.id = item.id;
+  constructor(item, sourceSite) {
+    this.id = `${sourceSite}-${item.id}`;
     this.n = item.name;
     this.prv = item.provider;
+    this.src = sourceSite;
   }
 }
 

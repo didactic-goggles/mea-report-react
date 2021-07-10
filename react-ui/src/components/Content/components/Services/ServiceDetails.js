@@ -1,6 +1,6 @@
 // import Axios from "axios";
 import React, { useState, useEffect } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useHistory, Link } from 'react-router-dom';
 import moment from 'moment';
 import API from '../../../../api';
 // import Chart from "react-apexcharts";
@@ -76,6 +76,9 @@ const ServiceDetails = () => {
       <DateRangePicker
         selectedDateHandler={setSelectedDate}
         selectedDate={selectedDate}
+        style={{ width: 230 }}
+        placement="bottomEnd"
+        className="mb-2"
       />
     </div>
   );
@@ -94,11 +97,7 @@ const ServiceDetails = () => {
       cell: (row) => {
         return (
           <div>
-            <a href={`/user/${row.u}`} onClick={async (e) => {
-              e.preventDefault();
-              const getUserIdFromName = await API.get(`/db/users?u=${row.u}`);
-              history.push(`/user/${getUserIdFromName[0].id}`);
-            }}>{row.u}</a>
+            <Link to={`/user/${row.u}`}>{row.u}</Link>
           </div>
         );
       },
@@ -149,7 +148,7 @@ const ServiceDetails = () => {
         <Filters />
         <div className="mb-3">
           <Datatable
-            title={`${service.id} ID'li Servisin Siparişleri`}
+            title={`${service.id.split('-')[1]} ID'li Servisin Siparişleri`}
             columns={columnsForOrders}
             data={allOrdersOfService}
             pagination

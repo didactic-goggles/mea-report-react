@@ -3,11 +3,10 @@ import moment from "moment";
 import * as Rsuite from "rsuite";
 import { Locale } from "../../constants/daterangepicker";
 const DateRangePicker = (props) => {
-  const {selectedDate, selectedDateHandler} = props;
+  const {selectedDate, selectedDateHandler, style, placement, className} = props;
 
   return (
     <Rsuite.DateRangePicker
-      placement={"bottomEnd"}
       locale={Locale}
       onChange={async (value) => {
         const selectedDateObject = {
@@ -16,6 +15,9 @@ const DateRangePicker = (props) => {
         };
         selectedDateHandler(selectedDateObject);
       }}
+      style={style}
+      placement={placement}
+      className={className}
       value={[
         moment(selectedDate.startDate * 1000)._d,
         moment(selectedDate.endDate * 1000)._d,

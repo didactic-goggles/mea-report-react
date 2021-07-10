@@ -7010,7 +7010,7 @@ a.close.disabled {
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 15;
+    /* z-index: 15; */
     display: flex;
     justify-content: center;
     padding-left: 0;
@@ -11657,7 +11657,7 @@ button,
 }
 
 .fixed-sidebar .app-main .app-main__outer {
-    z-index: 9;
+    /* z-index: 9; */
     padding-left: 280px
 }
 
@@ -11875,7 +11875,7 @@ button,
     flex: 1;
     flex-direction: column;
     display: flex;
-    z-index: 12
+    /* z-index: 12 */
 }
 
 .app-main .app-main__inner {

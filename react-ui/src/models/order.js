@@ -1,17 +1,19 @@
+/* eslint-disable no-extend-native */
 import moment from 'moment';
 
 class Order {
   constructor(
-    item
+    item, sourceSite
   ) {
     this.id = item.id;
-    this.u = item.user;
+    this.u = `${sourceSite}-${item.user}`;
     this.chg = Number(item.charge).round(3);
     this.cost = Number(item.cost).round(3);
     this.qt = Number(item.quantity);
-    this.sid = item.service_id;
+    this.sid = `${sourceSite}-${item.service_id}`;
     this.d = moment(item.created).unix();
     this.prv = item.provider;
+    this.src = sourceSite;
   }
 }
 

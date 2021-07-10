@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link, useHistory } from 'react-router-dom';
 import API from '../../../../api';
 import Chart from 'react-apexcharts';
-import ApexCharts from 'apexcharts';
 import Datatable from 'react-data-table-component';
 import DateRangePicker from '../../../UI/DateRangePicker';
 import BackButton from '../../../UI/BackButton';
 import moment from 'moment';
 import LoadingIndicator from '../../../UI/LoadingIndicator';
 
+import colors from '../../../../constants/colors';
+
 const UserDetails = (props) => {
   console.log('Rendering => UserDetails');
   let { userId } = useParams();
+  let history = useHistory();
   const [user, setUser] = useState(null);
   const [userOrders, setUserOrders] = useState([]);
   const [userPayments, setUserPayments] = useState([]);
   const [userServices, setUserServices] = useState([]);
+  const [userFavoriteServise, setUserFavouriteService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState({
     startDate: moment().subtract(7, 'days').unix(),
@@ -28,8 +31,8 @@ const UserDetails = (props) => {
       if (!userDetails) return;
       setLoading(true);
       const urls = [
-        `/db/orders?u=${userDetails.u}&d_gte=${selectedDate.startDate}&d_lte=${selectedDate.endDate}`,
-        `/db/payments?u=${userDetails.u}&c_gte=${selectedDate.startDate}&c_lte=${selectedDate.endDate}`,
+        `/db/orders?u=${userDetails.src}-${userDetails.u}&d_gte=${selectedDate.startDate}&d_lte=${selectedDate.endDate}`,
+        `/db/payments?u=${userDetails.src}-${userDetails.u}&c_gte=${selectedDate.startDate}&c_lte=${selectedDate.endDate}`,
       ];
       var promises = urls.map((url) => API.get(url));
       const responses = await Promise.all(promises);
@@ -66,13 +69,16 @@ const UserDetails = (props) => {
       });
       console.log(services);
       const servicesPromises = [];
-      const getServiceDetails = async (service) => {
-        const getService = await API.get(`/db/services/${service.id}`);
+      const getServiceDetails = async (service, i) => {
+        const getService = await API.get(
+          `/db/services/${service.id}`
+        );
         console.log(getService);
         service.name = getService.n;
+        service.color = colors[i];
       };
-      services.forEach((service) =>
-        servicesPromises.push(getServiceDetails(service))
+      services.forEach((service, i) =>
+        servicesPromises.push(getServiceDetails(service, i))
       );
       await Promise.all(servicesPromises);
       console.log(services);
@@ -107,6 +113,12 @@ const UserDetails = (props) => {
       const getSelectedUserResponse = await API.get(`/db/users/${userId}`);
       console.log(getSelectedUserResponse);
       setUser(getSelectedUserResponse);
+      if (getSelectedUserResponse.sid) {
+        const getServiceDetails = await API.get(
+          `/db/services/${getSelectedUserResponse.sid}`
+        );
+        setUserFavouriteService(getServiceDetails);
+      }
       // console.log(selectedUserDetails);
       // await getUserPaymentsAndOrders(getSelectedUserResponse);
       // setSelectedDate({
@@ -136,12 +148,13 @@ const UserDetails = (props) => {
           type: 'donut',
         },
         title: {
-          text: 'En çok kullandığı servisler',
+          text: 'Sipariş Sayısı',
         },
-        labels: chartUsagesArray.slice(0, 5).map((service) => service.name),
+        labels: chartUsagesArray.map((service) => service.name),
         dataLabels: {
           enabled: false,
         },
+        colors: chartUsagesArray.map((service) => service.color),
         //   responsive: [
         //     {
         //       breakpoint: 480,
@@ -166,9 +179,7 @@ const UserDetails = (props) => {
 
       return (
         <Chart
-          series={chartUsagesArray
-            .slice(0, 5)
-            .map((service) => service.quantity)}
+          series={chartUsagesArray.map((service) => service.quantity.round(3))}
           options={optionsChartUsages}
           type="donut"
           width="100%"
@@ -195,37 +206,21 @@ const UserDetails = (props) => {
           },
         },
         title: {
-          text: 'En çok harcadığı servisler',
+          text: 'Harcama',
         },
-        labels: chartSpentsArray.slice(0, 5).map((service) => service.name),
+        labels: chartSpentsArray.map((service) => service.name),
         dataLabels: {
           enabled: false,
         },
-        //   responsive: [
-        //     {
-        //       breakpoint: 480,
-        //       options: {
-        //         chart: {
-        //           width: "100%",
-        //           height: 350,
-        //         },
-        //         legend: {
-        //           show: false,
-        //         },
-        //       },
-        //     },
-        //   ],
         legend: {
           show: false,
-          // position: 'right',
-          // offsetY: 0,
-          // height: 230,
         },
+        colors: chartSpentsArray.map((service) => service.color),
       };
 
       return (
         <Chart
-          series={chartSpentsArray.slice(0, 5).map((service) => service.spent)}
+          series={chartSpentsArray.map((service) => service.spent.round(3))}
           options={optionsChartSpents}
           type="donut"
           width="100%"
@@ -237,149 +232,93 @@ const UserDetails = (props) => {
   };
 
   const ChartTotalUsagesTimeAxis = () => {
-    let data = user.payments
-      .map((payment) => {
-        return [moment(payment.created).valueOf(), Number(payment.Amount)];
-      })
-      .sort((a, b) => (a[0] > b[0] ? 1 : -1));
-    console.log(data);
-    const [graphicState, setGraphicState] = useState({
-      series: [
-        {
-          data,
-        },
-      ],
+    if (userOrders.length === 0) return null;
+    const series = [];
+    const dates = [];
+    userOrders.forEach((order) => {
+      const orderUnixDate = moment(order.d * 1000).startOf('day').unix();
+      let orderUnixDateIndex = dates.indexOf(orderUnixDate);
+      if (orderUnixDateIndex === -1) {
+        dates.push(orderUnixDate);
+        orderUnixDateIndex = dates.length -1;
+      }
+      
+      const seriesIndex = series.findIndex(s => s.name === order.sid) ;
+      if (seriesIndex === -1) {
+        const seriesObject = {};
+        seriesObject.name = order.sid;
+        seriesObject.data = [];
+        seriesObject.data[orderUnixDateIndex] = 1;
+        series.push(seriesObject);
+      } else {
+        if (series[seriesIndex].data[orderUnixDateIndex])
+          series[seriesIndex].data[orderUnixDateIndex] += 1;
+        else series[seriesIndex].data[orderUnixDateIndex] = 1;
+      }
+    });
+    series.forEach(service => {
+      const userServiceEq = userServices.filter(s => s.id === service.name)[0];
+      console.log(userServiceEq);
+      service.name = userServiceEq.name;
+    })
+    const options = {
+      series,
       options: {
         chart: {
-          id: 'area-datetime',
-          type: 'area',
-          height: 350,
-          zoom: {
-            autoScaleYaxis: true,
-          },
-        },
-        dataLabels: {
-          enabled: false,
-        },
-        markers: {
-          size: 0,
-          style: 'hollow',
-        },
-        xaxis: {
-          type: 'datetime',
-          min: moment().subtract(1, 'year').valueOf(),
-          tickAmount: 6,
-        },
-        tooltip: {
-          x: {
+          type: 'bar',
+          height: 550,
+          stacked: true,
+          toolbar: {
             show: true,
-            format: 'dd MMM',
-            formatter: undefined,
           },
-          y: {
-            formatter: undefined,
-            title: {
-              text: 'Tutar',
+          zoom: {
+            enabled: true,
+          },
+
+        },
+        responsive: [
+          {
+            breakpoint: 480,
+            options: {
+              legend: {
+                position: 'bottom',
+                offsetX: -10,
+                offsetY: 0,
+              },
             },
           },
-        },
-        fill: {
-          type: 'gradient',
-          gradient: {
-            shadeIntensity: 1,
-            opacityFrom: 0.7,
-            opacityTo: 0.9,
-            stops: [0, 100],
+        ],
+        
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            borderRadius: 10,
           },
         },
+        xaxis: {
+          type: 'date',
+          categories: dates.map(d => moment(d * 1000).format('DD/MM/YYYY')),
+        },
+        legend: {
+          position: 'bottom',
+          offsetX: -10,
+          offsetY: 0,
+        },
+        fill: {
+          opacity: 1,
+        },
+        colors: colors
       },
-      selection: 'one_month',
-    });
-
-    const updateData = (timeline) => {
-      setGraphicState({
-        selection: timeline,
-      });
-
-      switch (timeline) {
-        case 'one_month':
-          ApexCharts.exec(
-            'area-datetime',
-            'zoomX',
-            moment().subtract(1, 'month').valueOf(),
-            moment().valueOf()
-          );
-          break;
-        case 'six_months':
-          ApexCharts.exec(
-            'area-datetime',
-            'zoomX',
-            moment().subtract(6, 'month').valueOf(),
-            moment().valueOf()
-          );
-          break;
-        case 'one_year':
-          ApexCharts.exec(
-            'area-datetime',
-            'zoomX',
-            moment().subtract(1, 'year').valueOf(),
-            moment().valueOf()
-          );
-          break;
-        case 'all':
-          ApexCharts.exec(
-            'area-datetime',
-            'zoomX',
-            moment().subtract(2, 'years').valueOf(),
-            moment().valueOf()
-          );
-          break;
-        default:
-      }
     };
+
     return (
       <div id="chart">
-        <div className="toolbar">
-          <button
-            id="one_month"
-            onClick={() => updateData('one_month')}
-            className={graphicState.selection === 'one_month' ? 'active' : ''}
-          >
-            1 Ay
-          </button>
-          &nbsp;
-          <button
-            id="six_months"
-            onClick={() => updateData('six_months')}
-            className={graphicState.selection === 'six_months' ? 'active' : ''}
-          >
-            6 Ay
-          </button>
-          &nbsp;
-          <button
-            id="one_year"
-            onClick={() => updateData('one_year')}
-            className={graphicState.selection === 'one_year' ? 'active' : ''}
-          >
-            1 Yıl
-          </button>
-          &nbsp;
-          <button
-            id="all"
-            onClick={() => updateData('all')}
-            className={graphicState.selection === 'all' ? 'active' : ''}
-          >
-            Hepsi
-          </button>
-        </div>
-        <div id="chart-timeline">
-          <Chart
-            options={graphicState.options}
-            series={graphicState.series}
-            type="area"
-            height={350}
-          />
-        </div>
+        <Chart
+          options={options.options}
+          series={options.series}
+          type="bar"
+          height={options.options.chart.height}
+        />
       </div>
     );
   };
@@ -389,34 +328,40 @@ const UserDetails = (props) => {
       <DateRangePicker
         selectedDateHandler={setSelectedDate}
         selectedDate={selectedDate}
+        style={{ width: 230 }}
+        placement="bottomEnd"
+        className="mb-2"
       />
     </div>
   );
 
-  const columns = React.useMemo(
-    () => [
-      {
-        name: 'Servis',
-        selector: 'name',
-        sortable: true,
-        cell: (row) => <span>{row.name}</span>,
+  const columns = [
+    {
+      name: 'Servis',
+      selector: 'name',
+      sortable: true,
+      cell: (row) => {
+        return (
+          <div>
+            <Link to={`/service/${row.id}`}>{row.name}</Link>
+          </div>
+        );
       },
-      {
-        name: 'Harcama',
-        selector: 'spent',
-        sortable: true,
-        width: '150px',
-        cell: (row) => <span>{row.spent.toFixed(2)}</span>,
-      },
-      {
-        name: 'Top. Sipariş',
-        selector: 'quantity',
-        sortable: true,
-        width: '150px',
-      },
-    ],
-    []
-  );
+    },
+    {
+      name: 'Harcama',
+      selector: 'spent',
+      sortable: true,
+      width: '150px',
+      cell: (row) => <span>{row.spent.toFixed(2)}</span>,
+    },
+    {
+      name: 'Top. Sipariş',
+      selector: 'quantity',
+      sortable: true,
+      width: '150px',
+    },
+  ];
 
   if (loading) {
     return <LoadingIndicator />;
@@ -440,10 +385,23 @@ const UserDetails = (props) => {
               <div className="widget-content-wrapper">
                 <div className="widget-content-left">
                   <div className="widget-heading">{user.u}</div>
-                  <div className="widget-subheading">Kullanıcıya ait seçtiğin aralıktaki toplam sipariş</div>
+                  {userFavoriteServise ? (
+                    <div className="widget-subheading">
+                      Favori Servisi:{' '}
+                      <Link to={`/service/${userFavoriteServise.id}`}>
+                        {userFavoriteServise.n}
+                      </Link>
+                    </div>
+                  ) : null}
+
+                  <div className="widget-subheading">
+                    Kullanıcıya ait seçtiğin aralıktaki toplam sipariş
+                  </div>
                 </div>
                 <div className="widget-content-right">
-                  <div className="widget-numbers text-success">{userOrders.length}</div>
+                  <div className="widget-numbers text-success">
+                    {userOrders.length}
+                  </div>
                 </div>
               </div>
             </div>
@@ -454,9 +412,9 @@ const UserDetails = (props) => {
         <div className="col-lg-6">{ChartSpents()}</div>
         <div className="col-lg-6">{ChartUsages()}</div>
       </div>
-      {/* <div>
+      <div>
         <ChartTotalUsagesTimeAxis />
-      </div> */}
+      </div>
       <Filters />
       <Datatable
         title="Harcama yaptığı servisler"
@@ -470,3 +428,7 @@ const UserDetails = (props) => {
 };
 
 export default UserDetails;
+
+Number.prototype.round = function (places) {
+  return +(Math.round(this + 'e+' + places) + 'e-' + places);
+};
