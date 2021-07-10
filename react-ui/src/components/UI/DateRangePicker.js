@@ -15,6 +15,28 @@ const DateRangePicker = (props) => {
         };
         selectedDateHandler(selectedDateObject);
       }}
+      ranges={[
+        {
+        label: 'Dün',
+        value: [moment().subtract(1, 'day').format(), moment().subtract(1, 'day').format()]
+      }, 
+      {
+        label: 'Bugün',
+        value: [new Date(), new Date()]
+      }, 
+      {
+        label: 'Yarın',
+        value: [moment().add(1, 'day').format(), moment().add(1, 'day').format()]
+      }, 
+      {
+        label: 'Son 7 gün',
+        value: [moment().subtract(7, 'days').format(), new Date()]
+      },
+      {
+        label: 'Son 30 gün',
+        value: [moment().subtract(30, 'days').format(), new Date()]
+      }
+    ]}
       style={style}
       placement={placement}
       className={className}

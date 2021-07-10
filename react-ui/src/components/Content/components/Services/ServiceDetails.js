@@ -115,6 +115,13 @@ const ServiceDetails = () => {
       name: 'Kullanıcı',
       selector: 'user',
       sortable: true,
+      cell: (row) => {
+        return (
+          <div>
+            <Link to={`/user/${row.user}`}>{row.user}</Link>
+          </div>
+        );
+      },
     },
     {
       name: 'Toplam Sipariş',
