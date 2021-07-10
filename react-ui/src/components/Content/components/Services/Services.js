@@ -68,16 +68,16 @@ const Services = () => {
   useEffect(() => {
     const getServices = async () => {
       setLoading(true);
-      let url = '/db/services';
+      let url = '/db/services?';
       if (sourceSite && sourceSite !== '') {
-        url += `?src=${sourceSite}&`;
+        url += `src=${sourceSite}&`;
       } else {
         setServiceCalculation(null);
         // back to old columns 
         setVisibleColumns(visibleColumns.slice(0,3));
       }
       if (provider && provider !== '') {
-        url += `?prv=${provider}`;
+        url += `prv=${provider}`;
       }
       const getServicesResponse = await API.get(url);
       setServices(getServicesResponse);

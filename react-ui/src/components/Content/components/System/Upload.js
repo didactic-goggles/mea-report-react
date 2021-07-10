@@ -51,12 +51,14 @@ const Upload = () => {
                 id: `${fileSource}-${item.service_id}`,
                 name: item.service_name,
                 provider: item.Provider,
-              }, fileSource);
+                src: fileSource
+              });
               services.push(serviceItem);
               const userItem = new User({
                 id: `${fileSource}-${item.user}`,
-                name: item.user
-              }, fileSource);
+                name: item.user,
+                src: fileSource
+              });
               users.push(userItem);
               break;
             }

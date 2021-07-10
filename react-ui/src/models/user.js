@@ -1,8 +1,8 @@
 class User {
-  constructor(item, sourceSite) {
-    this.id = `${sourceSite}-${item.name}`;
+  constructor(item) {
+    this.id = item.id;
     this.u = item.name;
-    this.src = sourceSite;
+    this.src = item.src;
   }
 }
 

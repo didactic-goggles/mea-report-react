@@ -353,7 +353,7 @@ const UserDetails = (props) => {
       selector: 'spent',
       sortable: true,
       width: '150px',
-      cell: (row) => <span>{row.spent.toFixed(2)}</span>,
+      cell: (row) => <span>{row.spent.round(3)}</span>,
     },
     {
       name: 'Top. Sipariş',

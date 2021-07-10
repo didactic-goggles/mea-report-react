@@ -36,7 +36,7 @@ const Users = () => {
   });
   const [visibleColumns, setVisibleColumns] = useState([
     {
-      name: 'ID',
+      name: 'Name',
       selector: 'id',
       sortable: true,
       cell: (row) => {
