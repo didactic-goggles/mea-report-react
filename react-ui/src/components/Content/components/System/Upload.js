@@ -37,16 +37,23 @@ const Upload = () => {
       const services = [];
       const users = [];
       uploadedFiles.forEach(async (uploadedFile, index) => {
+        let firstItemDate, lastItemDate;
         console.log(uploadedFile);
         const id = moment().unix() + index;
         const uploadedJSON = await readFile(uploadedFile.file.blobFile);
         const url = `db/${uploadedFile.fileType || 'orders'}`;
         const items = [];
-        uploadedJSON.forEach((item) => {
+        uploadedJSON.forEach((item, i) => {
           let formattedItem;
           switch (uploadedFile.fileType) {
             case 'orders': {
               formattedItem = new Order(item, fileSource);
+              if (i === 0) {
+                firstItemDate = formattedItem.d;
+              }
+              if (i === uploadedJSON.length-1) {
+                lastItemDate = formattedItem.d;
+              }
               const serviceItem = new Service({
                 id: `${fileSource}-${item.service_id}`,
                 name: item.service_name,
@@ -85,6 +92,8 @@ const Upload = () => {
           ft: uploadedFile.fileType,
           c: new Date(),
           s: uploadedFile.file.blobFile.size,
+          fi: firstItemDate,
+          li: lastItemDate
         });
         await dispatch(
           addNewJob({

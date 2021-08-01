@@ -421,7 +421,12 @@ const UserDetails = (props) => {
         columns={columns}
         data={userServices}
         pagination
-        responsive
+        responsive={true}
+        striped={true}
+        highlightOnHover={true}
+        pointerOnHover={true}
+        defaultSortAsc={false}
+        paginationRowsPerPageOptions={[10, 20, 50, 100]}
       />
     </>
   );

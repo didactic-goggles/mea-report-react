@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Datatable from "react-data-table-component";
+import moment from 'moment';
 import API from "../../../../api";
 import LoadingIndicator from "../../../UI/LoadingIndicator";
 
@@ -56,7 +57,22 @@ const Files = () => {
       name: "Yükl. Tarihi",
       selector: "c",
       sortable: true,
-      maxWidth: '200px'
+      maxWidth: '200px',
+      cell: (row) => <span>{moment(row.c).format('DD/MM/YYYY HH:mm:ss')}</span>,
+    },
+    {
+      name: "İlk Öğe Tarihi",
+      selector: "fi",
+      sortable: true,
+      maxWidth: '200px',
+      cell: (row) => <span>{moment(row.fi * 1000).format('DD/MM/YYYY HH:mm:ss')}</span>,
+    },
+    {
+      name: "Son Öğe Tarihi",
+      selector: "li",
+      sortable: true,
+      maxWidth: '200px',
+      cell: (row) => <span>{moment(row.li * 1000).format('DD/MM/YYYY HH:mm:ss')}</span>,
     },
   ];
 
@@ -86,6 +102,9 @@ const Files = () => {
                     responsive={true}
                     striped={true}
                     highlightOnHover={true}
+                    pointerOnHover={true}
+                    defaultSortAsc={false}
+                    paginationRowsPerPageOptions={[10, 20, 50, 100]}
                   />
                 </div>
               </div>

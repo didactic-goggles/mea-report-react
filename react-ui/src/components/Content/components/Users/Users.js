@@ -264,7 +264,7 @@ const Users = () => {
         <div className="col-lg-12">
           <div className="mb-3 card card-body">
             <div className="row">
-              <div className="col-6">
+              <div className="col-6 d-flex flex-column">
                 <SelectPicker
                   data={[
                     { label: 'Measmm', value: 'measmm' },
@@ -334,13 +334,14 @@ const Users = () => {
               title="Kullanıcılar"
               columns={visibleColumns}
               data={users}
+              defaultSortField={datatableDefaultSortField}
               pagination
               responsive={true}
               striped={true}
               highlightOnHover={true}
               pointerOnHover={true}
-              defaultSortField={datatableDefaultSortField}
               defaultSortAsc={false}
+              paginationRowsPerPageOptions={[10, 20, 50, 100]}
               onRowClicked={(event) => {
                 history.push(`/user/${event.id}`);
               }}

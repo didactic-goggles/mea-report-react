@@ -159,6 +159,12 @@ const ServiceDetails = () => {
             columns={columnsForOrders}
             data={allOrdersOfService}
             pagination
+            responsive={true}
+            striped={true}
+            highlightOnHover={true}
+            pointerOnHover={true}
+            defaultSortAsc={false}
+            paginationRowsPerPageOptions={[10, 20, 50, 100]}
           />
         </div>
         <div className="mb-3">
@@ -166,9 +172,14 @@ const ServiceDetails = () => {
             title={`Servisi en çok kullananlar`}
             columns={columnsForUsers}
             data={allUsersOfService}
-            pagination
             defaultSortField="quantity"
             defaultSortAsc={false}
+            pagination
+            responsive={true}
+            striped={true}
+            highlightOnHover={true}
+            pointerOnHover={true}
+            paginationRowsPerPageOptions={[10, 20, 50, 100]}
           />
         </div>
       </>

@@ -108,7 +108,7 @@ function series(items, fn) {
     .then(() => result);
 }
 
-function splitToChunks(items, chunkSize = 100) {
+function splitToChunks(items, chunkSize = 50) {
   const result = [];
   for (let i = 0; i < items.length; i += chunkSize) {
     result.push(items.slice(i, i + chunkSize));
@@ -116,7 +116,7 @@ function splitToChunks(items, chunkSize = 100) {
   return result;
 }
 
-function chunks(items, fn, chunkSize = 200) {
+function chunks(items, fn, chunkSize = 50) {
   let result = [];
   const chunks = splitToChunks(items, chunkSize);
   return series(chunks, (chunk) => {
