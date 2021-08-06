@@ -18,6 +18,15 @@ export const addNewJob = createAsyncThunk(
   async (job, ThunkAPI) => {
     function fetchItemToServer(item) {
       // console.log(job, item);
+      if (job.method === 'delete') {
+        return client.delete(`${job.url}/${item.id}`).then(() => {
+          ThunkAPI.dispatch(
+            updateJob({
+              id: job.id,
+            })
+          );
+        });
+      } 
       return client.post(job.url, item).then(() => {
         ThunkAPI.dispatch(
           updateJob({
