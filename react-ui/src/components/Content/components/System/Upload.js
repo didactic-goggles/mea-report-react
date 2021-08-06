@@ -37,8 +37,9 @@ const Upload = () => {
       const services = [];
       const users = [];
       uploadedFiles.forEach(async (uploadedFile, index) => {
+        const fileId = moment().unix()+1;
         let firstItemDate, lastItemDate;
-        console.log(uploadedFile);
+        // console.log(uploadedFile);
         const id = moment().unix() + index;
         const uploadedJSON = await readFile(uploadedFile.file.blobFile);
         const url = `db/${uploadedFile.fileType || 'orders'}`;
@@ -47,6 +48,7 @@ const Upload = () => {
           let formattedItem;
           switch (uploadedFile.fileType) {
             case 'orders': {
+              item.fileId = fileId;
               formattedItem = new Order(item, fileSource);
               if (i === 0) {
                 firstItemDate = formattedItem.d;
@@ -87,6 +89,7 @@ const Upload = () => {
           items.push(formattedItem);
         });
         API.post('db/files', {
+          id: fileId,
           n: uploadedFile.file.name,
           e: uploadedFile.file.name.split('.').pop(),
           ft: uploadedFile.fileType,

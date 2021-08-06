@@ -122,13 +122,13 @@ const Services = () => {
         },
         {
           name: 'Toplam Tutar',
-          selector: 'chg',
+          selector: 'e',
           sortable: true,
           maxWidth: '100px',
         },
         {
           name: 'Toplam Kazanç',
-          selector: 'cost',
+          selector: 'c',
           sortable: true,
           maxWidth: '100px',
         },
@@ -155,23 +155,23 @@ const Services = () => {
       if (allOrders.length > 0) {
         const calculatedServices = {};
         allOrders.forEach((o) => {
-          const serviceIndex = o.sid;
+          const serviceIndex = o.s;
           if (calculatedServices[serviceIndex]) {
             calculatedServices[serviceIndex].q += 1;
-            calculatedServices[serviceIndex].chg += o.chg;
-            calculatedServices[serviceIndex].cost += o.cost;
+            calculatedServices[serviceIndex].e += o.e;
+            calculatedServices[serviceIndex].c += o.c;
           } else {
             calculatedServices[serviceIndex] = {};
             calculatedServices[serviceIndex].q = 1;
-            calculatedServices[serviceIndex].chg = o.chg;
-            calculatedServices[serviceIndex].cost = o.cost;
+            calculatedServices[serviceIndex].e = o.e;
+            calculatedServices[serviceIndex].c = o.c;
           }
         });
         const promisesArray = [];
         const updateService = async (serviceId, serviceData) => {
           // console.log(serviceId, serviceData);
-          serviceData.chg = serviceData.chg.round(3);
-          serviceData.cost = serviceData.cost.round(3);
+          serviceData.e = serviceData.e.round(3);
+          serviceData.c = serviceData.c.round(3);
           await API.patch(
             `/db/services/${serviceId}`,
             serviceData

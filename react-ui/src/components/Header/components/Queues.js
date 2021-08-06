@@ -3,9 +3,9 @@ import { useSelector } from 'react-redux';
 import { selectAllJobs } from '../../../store/reducers/upload';
 import { Card, ProgressBar } from 'react-bootstrap';
 const Queues = () => {
-  console.log('Rendering => Queues');
+  // console.log('Rendering => Queues');
   const jobs = useSelector(selectAllJobs);
-  console.log(jobs);
+  // console.log(jobs);
   const Job = (job) => {
     // const fileType =
     //   job.fileType == 'orders'

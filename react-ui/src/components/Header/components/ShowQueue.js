@@ -7,7 +7,7 @@ import { AiOutlineCloudUpload } from 'react-icons/ai';
 import Queues from './Queues';
 
 const ShowQueue = () => {
-  console.log('Rendering => ShowQueue');
+  // console.log('Rendering => ShowQueue');
   const jobs = useSelector(selectAllJobs);
   if (jobs.length < 1) {
     return null;

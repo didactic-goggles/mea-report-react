@@ -151,7 +151,7 @@ const Users = () => {
         ...activeColumns,
         {
           name: 'En Çok Kul. Servis',
-          selector: 'sid',
+          selector: 's',
           sortable: true,
           maxWidth: '200px',
           cell: (row) => {
@@ -159,7 +159,7 @@ const Users = () => {
               <CustomComponent
                 placement="top"
                 loading={loading}
-                serviceId={row.sid}
+                serviceId={row.s}
               />
               //
             );
@@ -173,13 +173,13 @@ const Users = () => {
         },
         {
           name: 'Toplam Tutar',
-          selector: 'chg',
+          selector: 'e',
           sortable: true,
           maxWidth: '100px',
         },
         {
           name: 'Toplam Kazanç',
-          selector: 'cost',
+          selector: 'c',
           sortable: true,
           maxWidth: '100px',
         },
@@ -209,27 +209,27 @@ const Users = () => {
           const userIndex = o.u;
           if (calculatedUsers[userIndex]) {
             calculatedUsers[userIndex].q += 1;
-            calculatedUsers[userIndex].chg += o.chg;
-            calculatedUsers[userIndex].cost += o.cost;
-            if (calculatedUsers[userIndex].services[o.sid])
-              calculatedUsers[userIndex].services[o.sid] += 1;
-            else calculatedUsers[userIndex].services[o.sid] = 1;
+            calculatedUsers[userIndex].e += o.e;
+            calculatedUsers[userIndex].c += o.c;
+            if (calculatedUsers[userIndex].services[o.s])
+              calculatedUsers[userIndex].services[o.s] += 1;
+            else calculatedUsers[userIndex].services[o.s] = 1;
           } else {
             calculatedUsers[userIndex] = {};
             calculatedUsers[userIndex].q = 1;
-            calculatedUsers[userIndex].chg = o.chg;
-            calculatedUsers[userIndex].cost = o.cost;
+            calculatedUsers[userIndex].e = o.e;
+            calculatedUsers[userIndex].c = o.c;
             calculatedUsers[userIndex].services = {};
-            calculatedUsers[userIndex].services[o.sid] = 1;
+            calculatedUsers[userIndex].services[o.s] = 1;
           }
         });
         const promisesArray = [];
         const updateUser = async (userId, userData) => {
-          userData.sid = Object.keys(userData.services).sort((k1, k2) =>
+          userData.s = Object.keys(userData.services).sort((k1, k2) =>
             userData.services[k1] < userData.services[k2] ? 1 : -1
           )[0];
-          userData.chg = userData.chg.round(3);
-          userData.cost = userData.cost.round(3);
+          userData.e = userData.e.round(3);
+          userData.c = userData.c.round(3);
           delete userData.services;
           const updateUserResponse = await API.patch(
             `/db/users/${userId}`,

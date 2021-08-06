@@ -1,8 +1,8 @@
 import * as actionTypes from './actionTypes';
 
 export const uploadStart = (job) => {
-    console.log('start');
-    console.log(job);
+    // console.log('start');
+    // console.log(job);
     return {
         type: actionTypes.UPLOAD_START,
         job: job
@@ -10,7 +10,7 @@ export const uploadStart = (job) => {
 };
 
 export const uploadProgress = (token, userId) => {
-    console.log('progress');
+    // console.log('progress');
 
     return {
         type: actionTypes.UPLOAD_PROGRESS
@@ -18,7 +18,7 @@ export const uploadProgress = (token, userId) => {
 };
 
 export const uploadSuccess = (token, userId) => {
-    console.log('success');
+    // console.log('success');
     return {
         type: actionTypes.UPLOAD_SUCCESS
     };

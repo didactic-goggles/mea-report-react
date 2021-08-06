@@ -74,7 +74,7 @@ const jobsSlice = createSlice({
       }
     },
     [addNewJob.rejected]: (state, action) => {
-      console.log(action.payload);
+      // console.log(action.payload);
       // state.status = 'failed';
       // state.error = action.payload;
     },

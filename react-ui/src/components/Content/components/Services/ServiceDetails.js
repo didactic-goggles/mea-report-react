@@ -44,7 +44,7 @@ const ServiceDetails = () => {
     const getOrders = async () => {
       setDetailsLoading(true);
       const orders = await API.get(
-        `/db/orders?sid=${serviceId}&d_gte=${selectedDate.startDate}&d_lte=${selectedDate.endDate}`
+        `/db/orders?s=${serviceId}&d_gte=${selectedDate.startDate}&d_lte=${selectedDate.endDate}`
       );
       setAllOrdersOfService(orders);
       const users = [];
@@ -57,11 +57,11 @@ const ServiceDetails = () => {
           users.push({
             user: order.u,
             quantity: 1,
-            amount: Number(order.chg),
+            amount: Number(order.e),
           });
         } else {
           users[userOrderIndex].quantity += 1;
-          users[userOrderIndex].amount += Number(order.chg);
+          users[userOrderIndex].amount += Number(order.e);
         }
       });
       setAllUsersOfService(users);

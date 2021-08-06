@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { IconButton, Icon } from "rsuite";
 import Datatable from "react-data-table-component";
 import moment from 'moment';
 import API from "../../../../api";
@@ -13,6 +14,10 @@ const Files = () => {
     const getFilesResponse = await API.get(`/db/files`);
     setFiles(getFilesResponse);
   };
+
+  const handleFileClick = (id) => {
+    console.log(id);
+  }
 
   const columns = [
     {
@@ -74,6 +79,12 @@ const Files = () => {
       maxWidth: '200px',
       cell: (row) => <span>{moment(row.li * 1000).format('DD/MM/YYYY HH:mm:ss')}</span>,
     },
+    {
+      name: '',
+      sortable: false,
+      maxWidth: '30px',
+      cell: (row) => <IconButton icon={<Icon icon="trash2"  />} color="red" appearance="link" onClick={() => handleFileClick(row.id)} />
+    }
   ];
 
   useEffect(() => {

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useHistory } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import API from '../../../../api';
 import Chart from 'react-apexcharts';
 import Datatable from 'react-data-table-component';
@@ -13,10 +13,9 @@ import colors from '../../../../constants/colors';
 const UserDetails = (props) => {
   console.log('Rendering => UserDetails');
   let { userId } = useParams();
-  let history = useHistory();
   const [user, setUser] = useState(null);
   const [userOrders, setUserOrders] = useState([]);
-  const [userPayments, setUserPayments] = useState([]);
+  // const [userPayments, setUserPayments] = useState([]);
   const [userServices, setUserServices] = useState([]);
   const [userFavoriteServise, setUserFavouriteService] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,10 +23,11 @@ const UserDetails = (props) => {
     startDate: moment().subtract(7, 'days').unix(),
     endDate: moment().unix(),
   });
+  const chartTotalUsages = useRef();
 
   const getUserDatas = async (userDetails) => {
     try {
-      console.log(userDetails);
+      // console.log(userDetails);
       if (!userDetails) return;
       setLoading(true);
       const urls = [
@@ -47,33 +47,34 @@ const UserDetails = (props) => {
       };
       const services = [];
       responses[0].forEach((order) => {
-        tempUser.spent += Number(order.cost);
+        tempUser.spent += Number(order.c);
         tempUser.quantity += 1;
         const isExistingServiceInUserSpendings = services.findIndex(
-          (service) => service.id === order.sid
+          (service) => service.id === order.s
         );
         if (isExistingServiceInUserSpendings !== -1) {
           const updatedServiceSpent =
             services[isExistingServiceInUserSpendings].spent +
-            Number(order.cost);
+            Number(order.c);
           services[isExistingServiceInUserSpendings].quantity += 1;
           services[isExistingServiceInUserSpendings].spent =
             updatedServiceSpent;
         } else {
           services.push({
-            id: order.sid,
+            id: order.s,
             quantity: 1,
-            spent: Number(order.cost),
+            spent: Number(order.c),
           });
         }
       });
-      console.log(services);
+      // console.log(services);
       const servicesPromises = [];
       const getServiceDetails = async (service, i) => {
+        console.log(service);
         const getService = await API.get(
           `/db/services/${service.id}`
         );
-        console.log(getService);
+        // console.log(getService);
         service.name = getService.n;
         service.color = colors[i];
       };
@@ -81,7 +82,7 @@ const UserDetails = (props) => {
         servicesPromises.push(getServiceDetails(service, i))
       );
       await Promise.all(servicesPromises);
-      console.log(services);
+      // console.log(services);
       setUserOrders(responses[0]);
       setUserServices(services);
       // setUser({
@@ -111,11 +112,11 @@ const UserDetails = (props) => {
     setLoading(true);
     const getUserDetails = async () => {
       const getSelectedUserResponse = await API.get(`/db/users/${userId}`);
-      console.log(getSelectedUserResponse);
+      // console.log(getSelectedUserResponse);
       setUser(getSelectedUserResponse);
-      if (getSelectedUserResponse.sid) {
+      if (getSelectedUserResponse.s) {
         const getServiceDetails = await API.get(
-          `/db/services/${getSelectedUserResponse.sid}`
+          `/db/services/${getSelectedUserResponse.s}`
         );
         setUserFavouriteService(getServiceDetails);
       }
@@ -243,10 +244,10 @@ const UserDetails = (props) => {
         orderUnixDateIndex = dates.length -1;
       }
       
-      const seriesIndex = series.findIndex(s => s.name === order.sid) ;
+      const seriesIndex = series.findIndex(s => s.name === order.s) ;
       if (seriesIndex === -1) {
         const seriesObject = {};
-        seriesObject.name = order.sid;
+        seriesObject.name = order.s;
         seriesObject.data = [];
         seriesObject.data[orderUnixDateIndex] = 1;
         series.push(seriesObject);
@@ -258,13 +259,26 @@ const UserDetails = (props) => {
     });
     series.forEach(service => {
       const userServiceEq = userServices.filter(s => s.id === service.name)[0];
-      console.log(userServiceEq);
+      // console.log(userServiceEq);
       service.name = userServiceEq.name;
-    })
+    });
+
     const options = {
       series,
       options: {
         chart: {
+          events: {
+            legendClick: function(chartContext, seriesIndex, config) {
+              series.forEach((s, i) => {
+                if (i === seriesIndex) {
+                  chartContext.showSeries(s.name);
+                } else {
+                  chartContext.hideSeries(s.name);
+                }
+              });
+              chartContext.showSeries(series[seriesIndex].name);
+            }
+          },
           type: 'bar',
           height: 550,
           stacked: true,
@@ -303,6 +317,9 @@ const UserDetails = (props) => {
           position: 'bottom',
           offsetX: -10,
           offsetY: 0,
+          onItemClick: {
+            toggleDataSeries: false
+          },
         },
         fill: {
           opacity: 1,
@@ -312,11 +329,25 @@ const UserDetails = (props) => {
     };
 
     return (
-      <div id="chart">
+      <div id="chart-totalUsages">
+        <button onClick={(e) => {
+          if(e.target.getAttribute('data-toggled') === 'true') {
+            e.target.setAttribute('data-toggled', 'false');
+            series.forEach((s) => {
+              chartTotalUsages.current.chart.showSeries(s.name);
+            });
+          } else {
+            e.target.setAttribute('data-toggled', 'true');
+            series.forEach((s) => {
+              chartTotalUsages.current.chart.hideSeries(s.name);
+            });
+          }
+        }}>Hepsini Gizle/Göster</button>
         <Chart
           options={options.options}
           series={options.series}
           type="bar"
+          ref={chartTotalUsages}
           height={options.options.chart.height}
         />
       </div>
