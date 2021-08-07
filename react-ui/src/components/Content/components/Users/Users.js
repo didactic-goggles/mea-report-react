@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-extend-native */
 import React, { useEffect, useState, forwardRef } from 'react';
 import { useHistory, Link } from 'react-router-dom';
@@ -8,7 +9,7 @@ import {
   Alert,
   TagPicker,
   Whisper,
-  Tooltip,
+  // Tooltip,
   Popover,
   Loader,
 } from 'rsuite';
@@ -97,14 +98,14 @@ const Users = () => {
     setTagValues(tempFilteredUsers);
   }, [users]);
 
-  const DefaultPopover = forwardRef(({ content, ...props }, ref) => {
-    return (
-      <Popover ref={ref} title="Title" {...props}>
-        <p>This is a Popover </p>
-        <p>{content}</p>
-      </Popover>
-    );
-  });
+  // const DefaultPopover = forwardRef(({ content, ...props }, ref) => {
+  //   return (
+  //     <Popover ref={ref} title="Title" {...props}>
+  //       <p>This is a Popover </p>
+  //       <p>{content}</p>
+  //     </Popover>
+  //   );
+  // });
 
   const PopoverWithLoader = forwardRef((props, ref) => {
     const { serviceId } = props;
@@ -136,11 +137,7 @@ const Users = () => {
       trigger="hover"
       placement={placement}
       controlId={`control-id-${placement}`}
-      speaker={
-
-          <PopoverWithLoader serviceId={serviceId} />
-
-      }
+      speaker={<PopoverWithLoader serviceId={serviceId} />}
     >
       <Link to={`/service/${serviceId}`}>{serviceId}</Link>
     </Whisper>

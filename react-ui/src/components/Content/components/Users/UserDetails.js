@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-extend-native */
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import API from '../../../../api';
@@ -47,15 +49,14 @@ const UserDetails = (props) => {
       };
       const services = [];
       responses[0].forEach((order) => {
-        tempUser.spent += Number(order.c);
+        tempUser.spent += Number(order.e);
         tempUser.quantity += 1;
         const isExistingServiceInUserSpendings = services.findIndex(
           (service) => service.id === order.s
         );
         if (isExistingServiceInUserSpendings !== -1) {
           const updatedServiceSpent =
-            services[isExistingServiceInUserSpendings].spent +
-            Number(order.c);
+            services[isExistingServiceInUserSpendings].spent + Number(order.e);
           services[isExistingServiceInUserSpendings].quantity += 1;
           services[isExistingServiceInUserSpendings].spent =
             updatedServiceSpent;
@@ -63,7 +64,7 @@ const UserDetails = (props) => {
           services.push({
             id: order.s,
             quantity: 1,
-            spent: Number(order.c),
+            spent: Number(order.e),
           });
         }
       });
@@ -71,9 +72,7 @@ const UserDetails = (props) => {
       const servicesPromises = [];
       const getServiceDetails = async (service, i) => {
         console.log(service);
-        const getService = await API.get(
-          `/db/services/${service.id}`
-        );
+        const getService = await API.get(`/db/services/${service.id}`);
         // console.log(getService);
         service.name = getService.n;
         service.color = colors[i];
@@ -237,14 +236,16 @@ const UserDetails = (props) => {
     const series = [];
     const dates = [];
     userOrders.forEach((order) => {
-      const orderUnixDate = moment(order.d * 1000).startOf('day').unix();
+      const orderUnixDate = moment(order.d * 1000)
+        .startOf('day')
+        .unix();
       let orderUnixDateIndex = dates.indexOf(orderUnixDate);
       if (orderUnixDateIndex === -1) {
         dates.push(orderUnixDate);
-        orderUnixDateIndex = dates.length -1;
+        orderUnixDateIndex = dates.length - 1;
       }
-      
-      const seriesIndex = series.findIndex(s => s.name === order.s) ;
+
+      const seriesIndex = series.findIndex((s) => s.name === order.s);
       if (seriesIndex === -1) {
         const seriesObject = {};
         seriesObject.name = order.s;
@@ -257,10 +258,12 @@ const UserDetails = (props) => {
         else series[seriesIndex].data[orderUnixDateIndex] = 1;
       }
     });
-    series.forEach(service => {
-      const userServiceEq = userServices.filter(s => s.id === service.name)[0];
+    series.forEach((service) => {
+      const userServiceEq = userServices.filter(
+        (s) => s.id === service.name
+      )[0];
       // console.log(userServiceEq);
-      service.name = userServiceEq.name;
+      if (userServiceEq) service.name = userServiceEq.name;
     });
 
     const options = {
@@ -268,7 +271,7 @@ const UserDetails = (props) => {
       options: {
         chart: {
           events: {
-            legendClick: function(chartContext, seriesIndex, config) {
+            legendClick: function (chartContext, seriesIndex, config) {
               series.forEach((s, i) => {
                 if (i === seriesIndex) {
                   chartContext.showSeries(s.name);
@@ -277,7 +280,7 @@ const UserDetails = (props) => {
                 }
               });
               chartContext.showSeries(series[seriesIndex].name);
-            }
+            },
           },
           type: 'bar',
           height: 550,
@@ -288,7 +291,6 @@ const UserDetails = (props) => {
           zoom: {
             enabled: true,
           },
-
         },
         responsive: [
           {
@@ -302,7 +304,7 @@ const UserDetails = (props) => {
             },
           },
         ],
-        
+
         plotOptions: {
           bar: {
             horizontal: false,
@@ -311,38 +313,42 @@ const UserDetails = (props) => {
         },
         xaxis: {
           type: 'date',
-          categories: dates.map(d => moment(d * 1000).format('DD/MM/YYYY')),
+          categories: dates.map((d) => moment(d * 1000).format('DD/MM/YYYY')),
         },
         legend: {
           position: 'bottom',
           offsetX: -10,
           offsetY: 0,
           onItemClick: {
-            toggleDataSeries: false
+            toggleDataSeries: false,
           },
         },
         fill: {
           opacity: 1,
         },
-        colors: colors
+        colors: colors,
       },
     };
 
     return (
       <div id="chart-totalUsages">
-        <button onClick={(e) => {
-          if(e.target.getAttribute('data-toggled') === 'true') {
-            e.target.setAttribute('data-toggled', 'false');
-            series.forEach((s) => {
-              chartTotalUsages.current.chart.showSeries(s.name);
-            });
-          } else {
-            e.target.setAttribute('data-toggled', 'true');
-            series.forEach((s) => {
-              chartTotalUsages.current.chart.hideSeries(s.name);
-            });
-          }
-        }}>Hepsini Gizle/Göster</button>
+        <button
+          onClick={(e) => {
+            if (e.target.getAttribute('data-toggled') === 'true') {
+              e.target.setAttribute('data-toggled', 'false');
+              series.forEach((s) => {
+                chartTotalUsages.current.chart.showSeries(s.name);
+              });
+            } else {
+              e.target.setAttribute('data-toggled', 'true');
+              series.forEach((s) => {
+                chartTotalUsages.current.chart.hideSeries(s.name);
+              });
+            }
+          }}
+        >
+          Hepsini Gizle/Göster
+        </button>
         <Chart
           options={options.options}
           series={options.series}

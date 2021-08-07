@@ -1,6 +1,6 @@
 // import Axios from "axios";
 import React, { useState, useEffect } from 'react';
-import { useParams, useHistory, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import moment from 'moment';
 import API from '../../../../api';
 // import Chart from "react-apexcharts";
@@ -13,7 +13,7 @@ import LoadingIndicator from '../../../UI/LoadingIndicator';
 
 const ServiceDetails = () => {
   console.log('Rendering => PaymentDetails');
-  let history = useHistory();
+  // let history = useHistory();
   // let { selectedService } = props;
   let { serviceId } = useParams();
 
@@ -50,9 +50,7 @@ const ServiceDetails = () => {
       const users = [];
       orders.forEach((order) => {
         // console.log(order);
-        const userOrderIndex = users.findIndex(
-          (user) => user.user === order.u
-        );
+        const userOrderIndex = users.findIndex((user) => user.user === order.u);
         if (userOrderIndex === -1) {
           users.push({
             user: order.u,
@@ -132,6 +130,7 @@ const ServiceDetails = () => {
       name: 'Toplam Tutar',
       selector: 'amount',
       sortable: true,
+      cell: (row) => <span>{row.amount.round(3)}</span>,
     },
   ];
 
@@ -196,10 +195,14 @@ const ServiceDetails = () => {
               <div className="widget-content-wrapper">
                 <div className="widget-content-left">
                   <div className="widget-heading">{service.n}</div>
-                  <div className="widget-subheading">Servise ait seçtiğin aralıktaki toplam sipariş</div>
+                  <div className="widget-subheading">
+                    Servise ait seçtiğin aralıktaki toplam sipariş
+                  </div>
                 </div>
                 <div className="widget-content-right">
-                  <div className="widget-numbers text-success">{allOrdersOfService.length}</div>
+                  <div className="widget-numbers text-success">
+                    {allOrdersOfService.length}
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { IconButton, Icon } from "rsuite";
+import React, { useEffect, useState } from 'react';
+import { IconButton, Icon } from 'rsuite';
 import { useDispatch } from 'react-redux';
 import { addNewJob } from '../../../../store/reducers/upload';
-import Datatable from "react-data-table-component";
+import Datatable from 'react-data-table-component';
 import moment from 'moment';
-import API from "../../../../api";
-import LoadingIndicator from "../../../UI/LoadingIndicator";
+import API from '../../../../api';
+import LoadingIndicator from '../../../UI/LoadingIndicator';
 
 const Files = () => {
-  console.log("Rendering => Files");
+  console.log('Rendering => Files');
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [files, setFiles] = useState([]);
@@ -28,79 +28,86 @@ const Files = () => {
         id,
         fileType: 'orders',
         fileTypeTR: 'Siparişler',
-        method: 'delete'
+        method: 'delete',
       })
     ).then(() => {
-      API.delete(`/db/files/${id}`)
+      API.delete(`/db/files/${id}`);
     });
-  }
+  };
 
   const columns = [
     {
-      name: "ID",
-      selector: "id",
+      name: 'ID',
+      selector: 'id',
       sortable: true,
-      width: "80px",
+      width: '80px',
     },
     {
-      name: "Servis Adı",
-      selector: "n",
+      name: 'Servis Adı',
+      selector: 'n',
       sortable: true,
-      cell: row => {
-      return <div>{row.n}</div>
-      }
+      cell: (row) => {
+        return <div>{row.n}</div>;
+      },
     },
     {
-      name: "Tür",
+      name: 'Tür',
       selector: 'fileType',
       sortable: true,
       maxWidth: '100px',
-      cell: row => {
+      cell: (row) => {
         let content;
-        if(row.ft === 'services')
-          content = 'Servis'
-        else if(row.ft === 'users')
-          content = 'Kullanıcı'
-        else if(row.ft === 'orders')
-          content = 'Sipariş'
-        else if(row.ft === 'payments')
-          content = 'Ödeme'
-      return <span>{content}</span>
-      }
+        if (row.ft === 'services') content = 'Servis';
+        else if (row.ft === 'users') content = 'Kullanıcı';
+        else if (row.ft === 'orders') content = 'Sipariş';
+        else if (row.ft === 'payments') content = 'Ödeme';
+        return <span>{content}</span>;
+      },
     },
     {
-      name: "Uzantı",
-      selector: "e",
+      name: 'Uzantı',
+      selector: 'e',
       sortable: true,
-      maxWidth: '100px'
+      maxWidth: '80px',
     },
     {
-      name: "Yükl. Tarihi",
-      selector: "c",
+      name: 'Yükl. Tarihi',
+      selector: 'c',
       sortable: true,
-      maxWidth: '200px',
+      maxWidth: '150px',
       cell: (row) => <span>{moment(row.c).format('DD/MM/YYYY HH:mm:ss')}</span>,
     },
     {
-      name: "İlk Öğe Tarihi",
-      selector: "fi",
+      name: 'İlk Öğe Tarihi',
+      selector: 'fi',
       sortable: true,
-      maxWidth: '200px',
-      cell: (row) => <span>{moment(row.fi * 1000).format('DD/MM/YYYY HH:mm:ss')}</span>,
+      maxWidth: '150px',
+      cell: (row) => (
+        <span>{moment(row.fi * 1000).format('DD/MM/YYYY HH:mm:ss')}</span>
+      ),
     },
     {
-      name: "Son Öğe Tarihi",
-      selector: "li",
+      name: 'Son Öğe Tarihi',
+      selector: 'li',
       sortable: true,
       maxWidth: '200px',
-      cell: (row) => <span>{moment(row.li * 1000).format('DD/MM/YYYY HH:mm:ss')}</span>,
+      cell: (row) => (
+        <span>{moment(row.li * 1000).format('DD/MM/YYYY HH:mm:ss')}</span>
+      ),
     },
     {
       name: '',
       sortable: false,
       maxWidth: '30px',
-      cell: (row) => <IconButton icon={<Icon icon="trash2"  />} color="red" appearance="link" onClick={() => handleFileClick(row.id)} />
-    }
+      cell: (row) => (
+        <IconButton
+          icon={<Icon icon="trash2" />}
+          color="red"
+          appearance="link"
+          onClick={() => handleFileClick(row.id)}
+        />
+      ),
+    },
   ];
 
   useEffect(() => {
@@ -117,26 +124,26 @@ const Files = () => {
   }
   return (
     <>
-          <div className="row">
-            <div className="col-lg-12">
-              <div className="mb-3 card">
-                <div className="card-body">
-                  <Datatable
-                    title="Dosyalar"
-                    columns={columns}
-                    data={files}
-                    pagination
-                    responsive={true}
-                    striped={true}
-                    highlightOnHover={true}
-                    pointerOnHover={true}
-                    defaultSortAsc={false}
-                    paginationRowsPerPageOptions={[10, 20, 50, 100]}
-                  />
-                </div>
-              </div>
+      <div className="row">
+        <div className="col-lg-12">
+          <div className="mb-3 card">
+            <div className="card-body">
+              <Datatable
+                title="Dosyalar"
+                columns={columns}
+                data={files}
+                pagination
+                responsive={true}
+                striped={true}
+                highlightOnHover={true}
+                pointerOnHover={true}
+                defaultSortAsc={false}
+                paginationRowsPerPageOptions={[10, 20, 50, 100]}
+              />
             </div>
           </div>
+        </div>
+      </div>
     </>
   );
 };

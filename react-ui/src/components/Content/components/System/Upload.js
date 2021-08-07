@@ -37,7 +37,7 @@ const Upload = () => {
       const services = [];
       const users = [];
       uploadedFiles.forEach(async (uploadedFile, index) => {
-        const fileId = moment().unix()+1;
+        const fileId = moment().unix() + 1;
         let firstItemDate, lastItemDate;
         // console.log(uploadedFile);
         const id = moment().unix() + index;
@@ -53,20 +53,20 @@ const Upload = () => {
               if (i === 0) {
                 firstItemDate = formattedItem.d;
               }
-              if (i === uploadedJSON.length-1) {
+              if (i === uploadedJSON.length - 1) {
                 lastItemDate = formattedItem.d;
               }
               const serviceItem = new Service({
                 id: `${fileSource}-${item.service_id}`,
                 name: item.service_name,
                 provider: item.Provider,
-                src: fileSource
+                src: fileSource,
               });
               services.push(serviceItem);
               const userItem = new User({
                 id: `${fileSource}-${item.user}`,
                 name: item.user,
-                src: fileSource
+                src: fileSource,
               });
               users.push(userItem);
               break;
@@ -96,7 +96,7 @@ const Upload = () => {
           c: new Date(),
           s: uploadedFile.file.blobFile.size,
           fi: firstItemDate,
-          li: lastItemDate
+          li: lastItemDate,
         });
         await dispatch(
           addNewJob({
@@ -154,9 +154,9 @@ const Upload = () => {
         ? 'Sipariş'
         : fileType === 'payments'
         ? 'Ödeme'
-        // : fileType === 'users'
-        // ? 'Kullanıcı'
-        : // : fileType === 'services'
+        : // : fileType === 'users'
+          // ? 'Kullanıcı'
+          // : fileType === 'services'
           // ? 'Servis'
           'Tanımsız';
     // console.log(convertedFileType);

@@ -1,3 +1,4 @@
+/* eslint-disable no-extend-native */
 import moment from 'moment';
 
 class Payment {

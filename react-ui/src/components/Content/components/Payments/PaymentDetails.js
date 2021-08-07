@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import React, { useState, useEffect } from 'react';
@@ -35,7 +36,8 @@ const PaymentDetails = (props) => {
       console.log(id);
       const getSelectedPaymentResponse = await API.get(`/db/payments/${id}`);
       console.log(getSelectedPaymentResponse);
-      if (getSelectedPaymentResponse) setSelectedPayment(getSelectedPaymentResponse);
+      if (getSelectedPaymentResponse)
+        setSelectedPayment(getSelectedPaymentResponse);
     }
     if (selectedPayment) {
       const getPaymentsResponse = await API.get(
@@ -70,7 +72,10 @@ const PaymentDetails = (props) => {
 
   const Filters = () => (
     <div className="d-flex justify-content-end mb-3">
-      <DateRangePicker selectedDateHandler={setSelectedDate} selectedDate={selectedDate} />
+      <DateRangePicker
+        selectedDateHandler={setSelectedDate}
+        selectedDate={selectedDate}
+      />
     </div>
   );
 
