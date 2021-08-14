@@ -20,7 +20,7 @@ const router = jsonServer.router(
 const PORT = process.env.PORT || 5000;
 
 const app = express();
-app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.json({ limit: '95mb' }));
 // Priority serve any static files.
 app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
 
@@ -75,4 +75,4 @@ app.listen(PORT, function () {
 });
 
 // opens the url in the default browser
-// open('http://localhost:5000');
+open('http://localhost:5000');
