@@ -264,8 +264,8 @@ const Users = () => {
               <div className="col-6 d-flex flex-column">
                 <SelectPicker
                   data={[
-                    { label: 'Measmm', value: 'measmm' },
-                    { label: 'Sosyalbayiniz', value: 'sb' },
+                    { label: 'Measmm', value: '1' },
+                    { label: 'Sosyalbayiniz', value: '2' },
                   ]}
                   style={{ width: 300 }}
                   value={sourceSite}

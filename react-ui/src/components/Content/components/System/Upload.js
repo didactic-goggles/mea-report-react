@@ -42,12 +42,13 @@ const Upload = () => {
         // console.log(uploadedFile);
         const id = moment().unix() + index;
         const uploadedJSON = await readFile(uploadedFile.file.blobFile);
-        const url = `db/${uploadedFile.fileType || 'orders'}`;
+        let url = `db/${uploadedFile.fileType || 'orders'}`;
         const items = [];
         uploadedJSON.forEach((item, i) => {
           let formattedItem;
           switch (uploadedFile.fileType) {
             case 'orders': {
+              url= 'multiple/ordersCollection';
               item.fileId = fileId;
               formattedItem = new Order(item, fileSource);
               if (i === 0) {
@@ -98,16 +99,23 @@ const Upload = () => {
           fi: firstItemDate,
           li: lastItemDate,
         });
-        await dispatch(
-          addNewJob({
-            url,
-            items,
-            name: uploadedFile.file.name,
-            id,
-            fileType: uploadedFile.fileType,
-            fileTypeTR: uploadedFile.fileTypeTR,
-          })
-        );
+        // console.log(JSON.stringify(items));
+        // console.log(JSON.stringify(services.filter(
+        //   (v, i, a) => a.findIndex((t) => t.id === v.id) === i
+        // )));
+        // console.log(JSON.stringify(users.filter(
+        //   (v, i, a) => a.findIndex((t) => t.u === v.u) === i
+        // )));
+        // await dispatch(
+        //   addNewJob({
+        //     url,
+        //     items,
+        //     name: uploadedFile.file.name,
+        //     id,
+        //     fileType: uploadedFile.fileType,
+        //     fileTypeTR: uploadedFile.fileTypeTR,
+        //   })
+        // );
         if (services.length > 0) {
           await dispatch(
             addNewJob({
@@ -136,6 +144,8 @@ const Upload = () => {
             })
           );
         }
+        API.post(url, items);
+
       });
 
       Alert.success('Dosya Yükleme başarılı', 5000);
@@ -226,8 +236,8 @@ const Upload = () => {
             placeholder="Dosya kaynağı seç"
             searchable={false}
             data={[
-              { label: 'Measmm', value: 'measmm' },
-              { label: 'Sosyalbayiniz', value: 'sb' },
+              { label: 'Measmm', value: '1' },
+              { label: 'Sosyalbayiniz', value: '2' },
             ]}
             onChange={(event) => setFileSource(event)}
             block

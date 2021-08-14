@@ -33,6 +33,12 @@ export const addNewJob = createAsyncThunk(
             id: job.id,
           })
         );
+      }).catch(() => {
+        ThunkAPI.dispatch(
+          updateJob({
+            id: job.id,
+          })
+        );
       });
     }
 
