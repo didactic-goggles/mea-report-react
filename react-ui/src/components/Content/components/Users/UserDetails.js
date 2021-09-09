@@ -25,6 +25,7 @@ const UserDetails = (props) => {
     startDate: moment().subtract(7, 'days').unix(),
     endDate: moment().unix(),
   });
+  // const [userTotalSpents, setUserTotalSpents] = useState(0);
   const chartTotalUsages = useRef();
 
   const getUserDatas = async (userDetails) => {
@@ -272,13 +273,13 @@ const UserDetails = (props) => {
         chart: {
           events: {
             legendClick: function (chartContext, seriesIndex, config) {
-              series.forEach((s, i) => {
-                if (i === seriesIndex) {
-                  chartContext.showSeries(s.name);
-                } else {
-                  chartContext.hideSeries(s.name);
-                }
-              });
+              // series.forEach((s, i) => {
+              //   if (i === seriesIndex) {
+              //     chartContext.showSeries(s.name);
+              //   } else {
+              //     chartContext.hideSeries(s.name);
+              //   }
+              // });
               chartContext.showSeries(series[seriesIndex].name);
             },
           },
@@ -430,14 +431,23 @@ const UserDetails = (props) => {
                       </Link>
                     </div>
                   ) : null}
-
-                  <div className="widget-subheading">
+                </div>
+              </div>
+              <div className="widget-content-wrapper">
+                <div className="widget-content-left">
+                  <div className="widget-subheading mb-4">
                     Kullanıcıya ait seçtiğin aralıktaki toplam sipariş
+                  </div>
+                  <div className="widget-subheading">
+                    Kullanıcıya ait seçtiğin aralıktaki toplam harcama
                   </div>
                 </div>
                 <div className="widget-content-right">
-                  <div className="widget-numbers text-success">
+                  <div className="widget-numbers text-success mb-2">
                     {userOrders.length}
+                  </div>
+                  <div className="widget-numbers text-success">
+                    {userOrders.reduce((total, uo) => total + uo.e, 0).round(3)}
                   </div>
                 </div>
               </div>

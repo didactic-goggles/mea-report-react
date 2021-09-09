@@ -7,6 +7,8 @@ import UserDetails from './Users/UserDetails';
 import Payments from './Payments/Payments';
 import Services from './Services/Services';
 import ServiceDetails from './Services/ServiceDetails';
+import Categories from './Categories/Categories';
+import CategoryDetails from './Categories/CategoryDetails';
 import Upload from './System/Upload';
 import Files from './System/Files';
 
@@ -30,6 +32,12 @@ function Container() {
           </Route>
           <Route path="/service/:serviceId">
             <ServiceDetails />
+          </Route>
+          <Route path="/categories/">
+            <Categories />
+          </Route>
+          <Route path="/category/:categoryId">
+            <CategoryDetails />
           </Route>
           <Route path="/upload">
             <Upload />

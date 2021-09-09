@@ -17,6 +17,7 @@ const Services = () => {
   const [datatableDefaultSortField, setDatatableDefaultSortField] =
     useState('n');
   const [services, setServices] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [providers, setProviders] = useState([]);
   const [sourceSite, setSourceSite] = useState('');
   const [provider, setProvider] = useState('');
@@ -32,7 +33,7 @@ const Services = () => {
       sortable: true,
       width: '80px',
       cell: (row) => {
-        return <div>{row.id.split('-')[1]}</div>;
+        return <div data-tag="allowRowEvents">{row.id.split('-')[1]}</div>;
       },
     },
     {
@@ -41,6 +42,14 @@ const Services = () => {
       sortable: true,
       cell: (row) => {
         return <div data-tag="allowRowEvents">{row.n}</div>;
+      },
+    },
+    {
+      name: 'Kategori',
+      selector: 'c',
+      sortable: true,
+      cell: (row) => {
+        return <div data-tag="allowRowEvents">{row.c}</div>;
       },
     },
     {
@@ -66,21 +75,28 @@ const Services = () => {
     setServiceCalculation(newReportItem);
   };
 
+  const getCategories = async () => {
+    const getCategoriesResponse = await API.get('/db/categories');
+    setCategories(getCategoriesResponse);
+  }
+
   useEffect(() => {
     const getServices = async () => {
       setLoading(true);
+      if(categories.length === 0) await getCategories();
       let url = '/db/services?';
       if (sourceSite && sourceSite !== '') {
         url += `src=${sourceSite}&`;
       } else {
         setServiceCalculation(null);
         // back to old columns 
-        setVisibleColumns(visibleColumns.slice(0,3));
+        setVisibleColumns(visibleColumns.slice(0,4));
       }
       if (provider && provider !== '') {
         url += `prv=${provider}`;
       }
       const getServicesResponse = await API.get(url);
+      console.log(categories);
       setServices(getServicesResponse);
       const activeReportItem = await API.get(
         `/db/reports?t=Service&src=${sourceSite}`
@@ -112,7 +128,7 @@ const Services = () => {
   }, [services]);
 
   useEffect(() => {
-    if (serviceCalculation && visibleColumns.length === 3) {
+    if (serviceCalculation && visibleColumns.length === 4) {
       setVisibleColumns((activeColumns) => [
         ...activeColumns,
         {
