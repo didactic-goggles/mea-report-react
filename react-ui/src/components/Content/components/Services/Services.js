@@ -4,8 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Datatable from 'react-data-table-component';
 import { Button, SelectPicker, Alert } from 'rsuite';
-import DateRangePicker from '../../../UI/DateRangePicker';
 import moment from 'moment';
+import { SocialIcon } from 'react-social-icons';
+import DateRangePicker from '../../../UI/DateRangePicker';
 import API from '../../../../api';
 import LoadingIndicator from '../../../UI/LoadingIndicator';
 
@@ -17,7 +18,7 @@ const Services = () => {
   const [datatableDefaultSortField, setDatatableDefaultSortField] =
     useState('n');
   const [services, setServices] = useState([]);
-  const [categories, setCategories] = useState([]);
+  // const [categories, setCategories] = useState([]);
   const [providers, setProviders] = useState([]);
   const [sourceSite, setSourceSite] = useState('');
   const [provider, setProvider] = useState('');
@@ -49,7 +50,19 @@ const Services = () => {
       selector: 'c',
       sortable: true,
       cell: (row) => {
-        return <div data-tag="allowRowEvents">{row.c}</div>;
+        return (
+          <div>
+            <SocialIcon
+              network={row.c.i}
+              className="mr-2"
+              style={{
+                width: 25,
+                height: 25,
+              }}
+            />
+            {row.c.n}
+          </div>
+        );
       },
     },
     {
@@ -75,15 +88,17 @@ const Services = () => {
     setServiceCalculation(newReportItem);
   };
 
-  const getCategories = async () => {
-    const getCategoriesResponse = await API.get('/db/categories');
-    setCategories(getCategoriesResponse);
-  }
+  // const getCategories = async () => {
+  //   const getCategoriesResponse = await API.get('/db/categories');
+  //   setCategories(getCategoriesResponse);
+  // }
+
+
 
   useEffect(() => {
     const getServices = async () => {
       setLoading(true);
-      if(categories.length === 0) await getCategories();
+      const categories = await API.get('/db/categories');
       let url = '/db/services?';
       if (sourceSite && sourceSite !== '') {
         url += `src=${sourceSite}&`;
@@ -97,6 +112,10 @@ const Services = () => {
       }
       const getServicesResponse = await API.get(url);
       console.log(categories);
+      getServicesResponse.forEach(service => {
+        const categoryIndex = categories.findIndex(c => c.id === service.c);
+        if (categoryIndex > -1) service.c = categories[categoryIndex];
+      })
       setServices(getServicesResponse);
       const activeReportItem = await API.get(
         `/db/reports?t=Service&src=${sourceSite}`

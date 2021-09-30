@@ -241,7 +241,8 @@ const Categories = () => {
             <div className="card-body">
               <div className="text-right">
                 <Button
-                  appearance="primary"
+                  color="cyan"
+                  className="mr-2"
                   onClick={handleSetMultipleCategoryUpdateButtonClick}
                 >
                   Servisleri Eşleştir

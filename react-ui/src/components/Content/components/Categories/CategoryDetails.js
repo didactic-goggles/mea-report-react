@@ -62,7 +62,7 @@ const CategoryDetails = () => {
     setCategoryIcon(getCategory.i);
     setLoading(false);
   };
-  // Get Service Details
+  // Get Category Details
   useEffect(() => {
     getCategory();
   }, [categoryId]);
