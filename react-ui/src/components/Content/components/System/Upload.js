@@ -37,13 +37,20 @@ const Upload = () => {
       const services = [];
       const users = [];
       uploadedFiles.forEach(async (uploadedFile, index) => {
-        const fileId = moment().unix() + 1;
         let firstItemDate, lastItemDate;
         // console.log(uploadedFile);
         const id = moment().unix() + index;
         const uploadedJSON = await readFile(uploadedFile.file.blobFile);
         let url = `db/${uploadedFile.fileType || 'orders'}`;
         const items = [];
+        const createdFileResponse = await API.post('db/files', {
+          n: uploadedFile.file.name,
+          e: uploadedFile.file.name.split('.').pop(),
+          ft: uploadedFile.fileType,
+          c: new Date(),
+          s: uploadedFile.file.blobFile.size
+        });
+        const fileId = createdFileResponse.id;
         uploadedJSON.forEach((item, i) => {
           let formattedItem;
           switch (uploadedFile.fileType) {
@@ -89,16 +96,10 @@ const Upload = () => {
           }
           items.push(formattedItem);
         });
-        API.post('db/files', {
-          id: fileId,
-          n: uploadedFile.file.name,
-          e: uploadedFile.file.name.split('.').pop(),
-          ft: uploadedFile.fileType,
-          c: new Date(),
-          s: uploadedFile.file.blobFile.size,
+        await API.patch(`db/files/${fileId}`, {
           fi: firstItemDate,
-          li: lastItemDate,
-        });
+          li: lastItemDate
+        })
         // console.log(JSON.stringify(items));
         // console.log(JSON.stringify(services.filter(
         //   (v, i, a) => a.findIndex((t) => t.id === v.id) === i

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { IconButton, Icon } from 'rsuite';
 import { useDispatch } from 'react-redux';
-import { addNewJob } from '../../../../store/reducers/upload';
+// import { addNewJob } from '../../../../store/reducers/upload';
 import Datatable from 'react-data-table-component';
 import moment from 'moment';
 import API from '../../../../api';
@@ -9,7 +9,7 @@ import LoadingIndicator from '../../../UI/LoadingIndicator';
 
 const Files = () => {
   console.log('Rendering => Files');
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [files, setFiles] = useState([]);
 
@@ -18,21 +18,24 @@ const Files = () => {
     setFiles(getFilesResponse);
   };
 
-  const handleFileClick = async (id) => {
-    const getAllOrdersFromFile = await API.get(`/db/orders?f=${id}`);
-    dispatch(
-      addNewJob({
-        url: '/db/orders',
-        items: getAllOrdersFromFile,
-        name: 'Siliniyor...',
-        id,
-        fileType: 'orders',
-        fileTypeTR: 'Siparişler',
-        method: 'delete',
-      })
-    ).then(() => {
-      API.delete(`/db/files/${id}`);
-    });
+  const handleFileClick = async (fileId) => {
+    // const getAllOrdersFromFile = await API.get(`/db/orders?f=${id}`);
+    await API.delete(`/multiple/ordersCollection/${fileId}`);
+    await API.delete(`/db/files/${fileId}`);
+    getFiles();
+    // dispatch(
+    //   addNewJob({
+    //     url: '/db/orders',
+    //     items: getAllOrdersFromFile,
+    //     name: 'Siliniyor...',
+    //     id,
+    //     fileType: 'orders',
+    //     fileTypeTR: 'Siparişler',
+    //     method: 'delete',
+    //   })
+    // ).then(async () => {
+    //   API.delete(`/db/files/${id}`);
+    // });
   };
 
   const columns = [

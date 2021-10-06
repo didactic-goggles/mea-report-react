@@ -100,27 +100,29 @@ const Categories = () => {
     console.log(updatedServices);
     tempUpdatedServices.forEach((service) => {
       try {
-        if (service.n.toLocaleLowerCase().includes('instagram')) {
+        if (
+          service.n.toLocaleLowerCase().indexOf('nstagram') > -1
+        ) {
           if (
-            service.n.toLocaleLowerCase().includes('like') ||
-            service.n.toLocaleLowerCase().includes('beğeni')
+            service.n.toLocaleLowerCase().indexOf('like') > -1 ||
+            service.n.toLocaleLowerCase().indexOf('beğeni') > -1
           ) {
             service.c = categories.filter(
               (c) =>
-                c.n.toLocaleLowerCase().includes('instagram') &&
-                (c.n.toLocaleLowerCase().includes('like') ||
-                  c.n.toLocaleLowerCase().includes('beğeni'))
+                c.n.toLocaleLowerCase().indexOf('nstagram') > -1 &&
+                (c.n.toLocaleLowerCase().indexOf('like') > -1 ||
+                  c.n.toLocaleLowerCase().indexOf('beğeni') > -1)
             )[0].id;
             console.log(service);
           } else if (
-            service.n.toLocaleLowerCase().includes('follower') ||
-            service.n.toLocaleLowerCase().includes('takipçi')
+            service.n.toLocaleLowerCase().indexOf('follower') > -1 ||
+            service.n.toLocaleLowerCase().indexOf('takipçi') > -1
           ) {
             service.c = categories.filter(
               (c) =>
-                c.n.toLocaleLowerCase().includes('instagram') &&
-                (c.n.toLocaleLowerCase().includes('follower') ||
-                  c.n.toLocaleLowerCase().includes('takipçi'))
+                c.n.toLocaleLowerCase().indexOf('nstagram') > -1 &&
+                (c.n.toLocaleLowerCase().indexOf('follower') > -1 ||
+                  c.n.toLocaleLowerCase().indexOf('takipçi') > -1)
             )[0].id;
           } else {
             service.c = categories.filter(
@@ -130,8 +132,10 @@ const Categories = () => {
         } else {
           console.log(service.n);
 
-          service.c = categories.filter((c) =>
-            service.n.toLocaleLowerCase().includes(c.n.toLocaleLowerCase())
+          service.c = categories.filter(
+            (c) =>
+              service.n.toLocaleLowerCase().indexOf(c.n.toLocaleLowerCase()) >
+              -1
           )[0].id;
         }
       } catch (error) {

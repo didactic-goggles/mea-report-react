@@ -27,15 +27,19 @@ app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
 app.use('/db', middlewares, router);
 
 app.post('/multiple/ordersCollection', (req, res) => {
-  fs.readFile('server/data/db.json',function(err,content){
-    if(err) throw err;
+  fs.readFile('server/data/db.json', function (err, content) {
+    if (err) throw err;
     var parseJson = JSON.parse(content);
     parseJson.orders.push(...req.body);
-    fs.writeFile('server/data/db.json',JSON.stringify(parseJson),function(err){
-      if(err) throw err;
-      res.sendStatus(201);
-    })
-  })
+    fs.writeFile(
+      'server/data/db.json',
+      JSON.stringify(parseJson),
+      function (err) {
+        if (err) throw err;
+        res.sendStatus(201);
+      }
+    );
+  });
   // const db = router.db; // Assign the lowdb instance
   // // console.log(req.body);
   // if (Array.isArray(req.body)) {
@@ -61,6 +65,24 @@ app.post('/multiple/ordersCollection', (req, res) => {
   // }
 });
 
+app.delete('/multiple/ordersCollection/:fileId', (req, res) => {
+  console.log(req.params.fileId);
+  fs.readFile('server/data/db.json', function (err, content) {
+    if (err) throw err;
+    const parseJson = JSON.parse(content);
+    parseJson.orders = parseJson.orders.filter(o => Number(o.f) !== Number(req.params.fileId))
+    console.log(parseJson);
+    fs.writeFile(
+      'server/data/db.json',
+      JSON.stringify(parseJson),
+      function (err) {
+        if (err) throw err;
+        res.sendStatus(204);
+      }
+    );
+  });
+});
+
 // All remaining requests return the React app, so it can handle routing.
 app.get('*', function (request, response) {
   response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
@@ -75,4 +97,4 @@ app.listen(PORT, function () {
 });
 
 // opens the url in the default browser
-open('http://localhost:5000');
+// open('http://localhost:5000');

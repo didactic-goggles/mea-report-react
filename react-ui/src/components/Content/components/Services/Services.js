@@ -18,10 +18,11 @@ const Services = () => {
   const [datatableDefaultSortField, setDatatableDefaultSortField] =
     useState('n');
   const [services, setServices] = useState([]);
-  // const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [providers, setProviders] = useState([]);
   const [sourceSite, setSourceSite] = useState('');
   const [provider, setProvider] = useState('');
+  const [category, setCategory] = useState(null);
   const [serviceCalculation, setServiceCalculation] = useState(null);
   const [selectedDate, setSelectedDate] = useState({
     startDate: moment().subtract(7, 'days').unix(),
@@ -48,19 +49,20 @@ const Services = () => {
     {
       name: 'Kategori',
       selector: 'c',
+      width: '200px',
       sortable: true,
       cell: (row) => {
         return (
           <div>
-            <SocialIcon
+            {row.c && row.c.i && <SocialIcon
               network={row.c.i}
               className="mr-2"
               style={{
                 width: 25,
                 height: 25,
               }}
-            />
-            {row.c.n}
+            />}
+            {(row.c && row.c.n) || 'Tanımlı değil'}
           </div>
         );
       },
@@ -88,17 +90,20 @@ const Services = () => {
     setServiceCalculation(newReportItem);
   };
 
-  // const getCategories = async () => {
-  //   const getCategoriesResponse = await API.get('/db/categories');
-  //   setCategories(getCategoriesResponse);
-  // }
+  const getCategories = async () => {
+    const getCategoriesResponse = await API.get('/db/categories');
+    setCategories(getCategoriesResponse);
+  }
 
-
+  useEffect(() => {
+    getCategories();
+  }, []);
 
   useEffect(() => {
     const getServices = async () => {
       setLoading(true);
-      const categories = await API.get('/db/categories');
+      // const categories = await API.get('/db/categories');
+      const categoriesArray = await API.get('/db/categories');
       let url = '/db/services?';
       if (sourceSite && sourceSite !== '') {
         url += `src=${sourceSite}&`;
@@ -108,13 +113,16 @@ const Services = () => {
         setVisibleColumns(visibleColumns.slice(0,4));
       }
       if (provider && provider !== '') {
-        url += `prv=${provider}`;
+        url += `prv=${provider}&`;
+      }
+      if (category && category !== '') {
+        url += `c=${category}`;
       }
       const getServicesResponse = await API.get(url);
       console.log(categories);
       getServicesResponse.forEach(service => {
-        const categoryIndex = categories.findIndex(c => c.id === service.c);
-        if (categoryIndex > -1) service.c = categories[categoryIndex];
+        const categoryIndex = categoriesArray.findIndex(c => c.id === service.c);
+        if (categoryIndex > -1) service.c = categoriesArray[categoryIndex];
       })
       setServices(getServicesResponse);
       const activeReportItem = await API.get(
@@ -124,7 +132,7 @@ const Services = () => {
       setLoading(false);
     };
     getServices();
-  }, [sourceSite, provider]);
+  }, [sourceSite, provider, category]);
 
   // useEffect(() => {
   //   const getServices = async () => {
@@ -293,6 +301,52 @@ const Services = () => {
                 </span>
               </div>
             )}
+            <div className="row">
+              <div className="col-6">
+              <SelectPicker
+                data={categories.map((ct) => ({
+                  label: ct.n,
+                  value: ct.id,
+                  icon: ct.i
+                }))}
+                style={{ width: 300 }}
+                onChange={(value) => setCategory(value)}
+                placeholder="Kategori"
+                value={category}
+                renderMenuItem={(label, item) => {
+                  return (
+                    <div>
+                      <SocialIcon
+                        network={item.icon}
+                        className="mr-2"
+                        style={{
+                          width: 25,
+                          height: 25,
+                        }}
+                      />
+                      {label.charAt(0).toLocaleUpperCase() + label.slice(1)}
+                    </div>
+                  );
+                }}
+                renderValue={(value, item) => {
+                  console.log(value, item)
+                  return (
+                    <div>
+                      <SocialIcon
+                        network={item?.icon}
+                        className="mr-2"
+                        style={{
+                          width: 25,
+                          height: 25,
+                        }}
+                      />
+                      {item.label.charAt(0).toLocaleUpperCase() + item.label.slice(1)}
+                    </div>
+                  );
+                }}
+              />
+              </div>
+            </div>
             <Datatable
               title="Servisler"
               columns={visibleColumns}
