@@ -5,9 +5,10 @@ import { useParams, Link } from 'react-router-dom';
 import API from '../../../../api';
 import Chart from 'react-apexcharts';
 import Datatable from 'react-data-table-component';
+import moment from 'moment';
+import { SocialIcon } from 'react-social-icons';
 import DateRangePicker from '../../../UI/DateRangePicker';
 import BackButton from '../../../UI/BackButton';
-import moment from 'moment';
 import LoadingIndicator from '../../../UI/LoadingIndicator';
 
 import colors from '../../../../constants/colors';
@@ -16,6 +17,7 @@ const UserDetails = (props) => {
   console.log('Rendering => UserDetails');
   let { userId } = useParams();
   const [user, setUser] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [userOrders, setUserOrders] = useState([]);
   // const [userPayments, setUserPayments] = useState([]);
   const [userServices, setUserServices] = useState([]);
@@ -35,7 +37,7 @@ const UserDetails = (props) => {
       setLoading(true);
       const urls = [
         `/db/orders?u=${userDetails.src}-${userDetails.u}&d_gte=${selectedDate.startDate}&d_lte=${selectedDate.endDate}`,
-        `/db/payments?u=${userDetails.src}-${userDetails.u}&c_gte=${selectedDate.startDate}&c_lte=${selectedDate.endDate}`,
+        // `/db/payments?u=${userDetails.src}-${userDetails.u}&c_gte=${selectedDate.startDate}&c_lte=${selectedDate.endDate}`,
       ];
       var promises = urls.map((url) => API.get(url));
       const responses = await Promise.all(promises);
@@ -77,6 +79,7 @@ const UserDetails = (props) => {
         // console.log(getService);
         service.name = getService.n;
         service.color = colors[i];
+        service.c = categories.find(c => c.id === getService.c);
       };
       services.forEach((service, i) =>
         servicesPromises.push(getServiceDetails(service, i))
@@ -107,6 +110,13 @@ const UserDetails = (props) => {
   //     getter();
   //     console.log(selectedUserDetails)
   // }, []);
+
+  const getCategories = async () => {
+    const getCategoriesResponse = await API.get('/db/categories');
+    setCategories(getCategoriesResponse);
+  }
+
+  useEffect(() => getCategories(), []);
 
   useEffect(() => {
     setLoading(true);
@@ -232,6 +242,52 @@ const UserDetails = (props) => {
     }
   };
 
+  const ChartCategories = () => {
+    try {
+      if (!userServices || userServices.length === 0) return;
+
+      const chartCategoriesArray = categories.map((category) => {
+        return {
+          ...category,
+          spent: userServices.filter(s => s.c.id === category.id).reduce((sum, b) => sum + b.spent, 0)
+        }
+      }).filter(c => c.spent > 0);
+
+      console.log(colors.splice(0, chartCategoriesArray.length), chartCategoriesArray)
+
+      var optionsChartCategories = {
+        options: {
+          chart: {
+            width: 200,
+            type: 'donut',
+          },
+        },
+        title: {
+          text: 'Kategori Harcama',
+        },
+        labels: chartCategoriesArray.map((category) => category.n),
+        dataLabels: {
+          enabled: false,
+        },
+        legend: {
+          show: false,
+        },
+        // colors: colors.splice(0 , chartCategoriesArray.length),
+      };
+
+      return (
+        <Chart
+          series={chartCategoriesArray.map((category) => category.spent.round(3))}
+          options={optionsChartCategories}
+          type="donut"
+          width="100%"
+        />
+      );
+    } catch (error) {
+      return;
+    }
+  };
+
   const ChartTotalUsagesTimeAxis = () => {
     if (userOrders.length === 0) return null;
     const series = [];
@@ -328,6 +384,20 @@ const UserDetails = (props) => {
           opacity: 1,
         },
         colors: colors,
+        zoom: {
+          enabled: true,
+          type: 'x',
+          resetIcon: {
+              offsetX: -10,
+              offsetY: 0,
+              fillColor: '#fff',
+              strokeColor: '#37474F'
+          },
+          selection: {
+              background: '#90CAF9',
+              border: '#0D47A1'
+          }    
+      }
       },
     };
 
@@ -382,6 +452,27 @@ const UserDetails = (props) => {
         return (
           <div>
             <Link to={`/service/${row.id}`}>{row.name}</Link>
+          </div>
+        );
+      },
+    },
+    {
+      name: 'Kategori',
+      selector: 'c',
+      width: '200px',
+      sortable: true,
+      cell: (row) => {
+        return (
+          <div>
+            {row.c && row.c.i && <SocialIcon
+              network={row.c.i}
+              className="mr-2"
+              style={{
+                width: 25,
+                height: 25,
+              }}
+            />}
+            {(row.c && row.c.n) || 'Tanımlı değil'}
           </div>
         );
       },
@@ -456,8 +547,9 @@ const UserDetails = (props) => {
         </div>
       </div>
       <div className="row mb-3">
-        <div className="col-lg-6">{ChartSpents()}</div>
-        <div className="col-lg-6">{ChartUsages()}</div>
+        <div className="col-4">{ChartSpents()}</div>
+        <div className="col-4">{ChartUsages()}</div>
+        <div className="col-4">{ChartCategories()}</div>
       </div>
       <div>
         <ChartTotalUsagesTimeAxis />
