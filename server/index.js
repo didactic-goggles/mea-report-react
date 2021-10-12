@@ -70,8 +70,7 @@ app.delete('/multiple/ordersCollection/:fileId', (req, res) => {
   fs.readFile('server/data/db.json', function (err, content) {
     if (err) throw err;
     const parseJson = JSON.parse(content);
-    parseJson.orders = parseJson.orders.filter(o => Number(o.f) !== Number(req.params.fileId))
-    console.log(parseJson);
+    parseJson.orders = parseJson.orders.filter(o => Number(o.f) !== Number(req.params.fileId));
     fs.writeFile(
       'server/data/db.json',
       JSON.stringify(parseJson),
