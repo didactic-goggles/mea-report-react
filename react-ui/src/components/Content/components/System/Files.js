@@ -20,8 +20,8 @@ const Files = () => {
 
   const handleFileClick = async (fileId) => {
     // const getAllOrdersFromFile = await API.get(`/db/orders?f=${id}`);
-    await API.delete(`/multiple/ordersCollection/${fileId}`);
     await API.delete(`/db/files/${fileId}`);
+    await API.delete(`/multiple/ordersCollection/${fileId}`);
     getFiles();
     // dispatch(
     //   addNewJob({
