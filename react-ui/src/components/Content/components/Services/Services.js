@@ -22,6 +22,7 @@ const Services = () => {
   const [providers, setProviders] = useState([]);
   const [sourceSite, setSourceSite] = useState('');
   const [provider, setProvider] = useState('');
+  const [selectedService, setSelectedService] = useState(null);
   const [category, setCategory] = useState(null);
   const [serviceCalculation, setServiceCalculation] = useState(null);
   const [selectedDate, setSelectedDate] = useState({
@@ -54,14 +55,16 @@ const Services = () => {
       cell: (row) => {
         return (
           <div>
-            {row.c && row.c.i && <SocialIcon
-              network={row.c.i}
-              className="mr-2"
-              style={{
-                width: 25,
-                height: 25,
-              }}
-            />}
+            {row.c && row.c.i && (
+              <SocialIcon
+                network={row.c.i}
+                className="mr-2"
+                style={{
+                  width: 25,
+                  height: 25,
+                }}
+              />
+            )}
             {(row.c && row.c.n) || 'Tanımlı değil'}
           </div>
         );
@@ -93,7 +96,7 @@ const Services = () => {
   const getCategories = async () => {
     const getCategoriesResponse = await API.get('/db/categories');
     setCategories(getCategoriesResponse);
-  }
+  };
 
   useEffect(() => {
     getCategories();
@@ -105,25 +108,33 @@ const Services = () => {
       // const categories = await API.get('/db/categories');
       const categoriesArray = await API.get('/db/categories');
       let url = '/db/services?';
-      if (sourceSite && sourceSite !== '') {
-        url += `src=${sourceSite}&`;
+      console.log (selectedService)
+      if (!selectedService) {
+        if (sourceSite && sourceSite !== '') {
+          url += `src=${sourceSite}&`;
+        } else {
+          setServiceCalculation(null);
+          // back to old columns
+          setVisibleColumns(visibleColumns.slice(0, 4));
+        }
+        if (provider && provider !== '') {
+          url += `prv=${provider}&`;
+        }
+        if (category && category !== '') {
+          url += `c=${category}`;
+        }
       } else {
-        setServiceCalculation(null);
-        // back to old columns 
-        setVisibleColumns(visibleColumns.slice(0,4));
-      }
-      if (provider && provider !== '') {
-        url += `prv=${provider}&`;
-      }
-      if (category && category !== '') {
-        url += `c=${category}`;
+        console.log(selectedService);
+        url = `/db/services?id_like=${selectedService}`;
       }
       const getServicesResponse = await API.get(url);
       console.log(categories);
-      getServicesResponse.forEach(service => {
-        const categoryIndex = categoriesArray.findIndex(c => c.id === service.c);
+      getServicesResponse.forEach((service) => {
+        const categoryIndex = categoriesArray.findIndex(
+          (c) => c.id === service.c
+        );
         if (categoryIndex > -1) service.c = categoriesArray[categoryIndex];
-      })
+      });
       setServices(getServicesResponse);
       const activeReportItem = await API.get(
         `/db/reports?t=Service&src=${sourceSite}`
@@ -132,7 +143,7 @@ const Services = () => {
       setLoading(false);
     };
     getServices();
-  }, [sourceSite, provider, category]);
+  }, [sourceSite, provider, category, selectedService]);
 
   // useEffect(() => {
   //   const getServices = async () => {
@@ -216,10 +227,7 @@ const Services = () => {
           // console.log(serviceId, serviceData);
           serviceData.e = serviceData.e.round(3);
           serviceData.c = serviceData.c.round(3);
-          await API.patch(
-            `/db/services/${serviceId}`,
-            serviceData
-          );
+          await API.patch(`/db/services/${serviceId}`, serviceData);
         };
         Object.keys(calculatedServices).forEach((serviceId) => {
           promisesArray.push(
@@ -303,48 +311,67 @@ const Services = () => {
             )}
             <div className="row">
               <div className="col-6">
-              <SelectPicker
-                data={categories.map((ct) => ({
-                  label: ct.n,
-                  value: ct.id,
-                  icon: ct.i
-                }))}
-                style={{ width: 300 }}
-                onChange={(value) => setCategory(value)}
-                placeholder="Kategori"
-                value={category}
-                renderMenuItem={(label, item) => {
-                  return (
-                    <div>
-                      <SocialIcon
-                        network={item.icon}
-                        className="mr-2"
-                        style={{
-                          width: 25,
-                          height: 25,
-                        }}
-                      />
-                      {label.charAt(0).toLocaleUpperCase() + label.slice(1)}
-                    </div>
-                  );
-                }}
-                renderValue={(value, item) => {
-                  console.log(value, item)
-                  return (
-                    <div>
-                      <SocialIcon
-                        network={item?.icon}
-                        className="mr-2"
-                        style={{
-                          width: 25,
-                          height: 25,
-                        }}
-                      />
-                      {item.label.charAt(0).toLocaleUpperCase() + item.label.slice(1)}
-                    </div>
-                  );
-                }}
-              />
+                <SelectPicker
+                  data={categories.map((ct) => ({
+                    label: ct.n,
+                    value: ct.id,
+                    icon: ct.i,
+                  }))}
+                  style={{ width: 300 }}
+                  onChange={(value) => setCategory(value)}
+                  placeholder="Kategori"
+                  value={category}
+                  renderMenuItem={(label, item) => {
+                    return (
+                      <div>
+                        <SocialIcon
+                          network={item.icon}
+                          className="mr-2"
+                          style={{
+                            width: 25,
+                            height: 25,
+                          }}
+                        />
+                        {label.charAt(0).toLocaleUpperCase() + label.slice(1)}
+                      </div>
+                    );
+                  }}
+                  renderValue={(value, item) => {
+                    return (
+                      <div>
+                        <SocialIcon
+                          network={item?.icon}
+                          className="mr-2"
+                          style={{
+                            width: 25,
+                            height: 25,
+                          }}
+                        />
+                        {item.label.charAt(0).toLocaleUpperCase() +
+                          item.label.slice(1)}
+                      </div>
+                    );
+                  }}
+                  className="mb-2"
+                />
+                <SelectPicker
+                  data={
+                    services.length
+                      ? services.map((service) => {
+                          return {
+                            label: service.id + " " + service.n,
+                            value: service.id,
+                          };
+                        })
+                      : []
+                  }
+                  style={{ width: 300 }}
+                  // onChange={(e) => onChangeHandler(e)}
+                  value={selectedService}
+                  onChange={(value) => setSelectedService(value)}
+                  placeholder="Servis seç"
+                  className="mb-2"
+                />
               </div>
             </div>
             <Datatable
