@@ -126,7 +126,7 @@ const Categories = () => {
             )[0].id;
           } else {
             service.c = categories.filter(
-              (c) => c.n.toLocaleLowerCase() === 'instagram diğer'
+              (c) => c.n.toLocaleLowerCase().includes('diğer')
             )[0].id;
           }
         } else {
@@ -140,7 +140,7 @@ const Categories = () => {
         }
       } catch (error) {
         service.c = categories.filter(
-          (c) => c.n.toLocaleLowerCase() === 'nstagram diğer'
+          (c) => c.n.toLocaleLowerCase().includes('diğer')
         )[0].id;
       }
     });
