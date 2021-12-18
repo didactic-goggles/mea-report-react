@@ -107,7 +107,7 @@ const Categories = () => {
             service.n.toLocaleLowerCase().indexOf('like') > -1 ||
             service.n.toLocaleLowerCase().indexOf('beğeni') > -1
           ) {
-            service.c = categories.filter(
+            service.ci = categories.filter(
               (c) =>
                 c.n.toLocaleLowerCase().indexOf('nstagram') > -1 &&
                 (c.n.toLocaleLowerCase().indexOf('like') > -1 ||
@@ -118,28 +118,28 @@ const Categories = () => {
             service.n.toLocaleLowerCase().indexOf('follower') > -1 ||
             service.n.toLocaleLowerCase().indexOf('takipçi') > -1
           ) {
-            service.c = categories.filter(
+            service.ci = categories.filter(
               (c) =>
                 c.n.toLocaleLowerCase().indexOf('nstagram') > -1 &&
                 (c.n.toLocaleLowerCase().indexOf('follower') > -1 ||
                   c.n.toLocaleLowerCase().indexOf('takipçi') > -1)
             )[0].id;
           } else {
-            service.c = categories.filter(
+            service.ci = categories.filter(
               (c) => c.n.toLocaleLowerCase().includes('diğer')
             )[0].id;
           }
         } else {
           console.log(service.n);
 
-          service.c = categories.filter(
+          service.ci = categories.filter(
             (c) =>
               service.n.toLocaleLowerCase().indexOf(c.n.toLocaleLowerCase()) >
               -1
           )[0].id;
         }
       } catch (error) {
-        service.c = categories.filter(
+        service.ci = categories.filter(
           (c) => c.n.toLocaleLowerCase().includes('diğer')
         )[0].id;
       }
@@ -152,10 +152,11 @@ const Categories = () => {
     setFormMultipleCategoryUpdateSubmitting(true);
     const servicePromises = [];
     const updateService = async (s) =>
-      await API.patch(`/db/services/${s.id}`, { c: s.c });
+      await API.patch(`/db/services/${s.id}`, { ci: s.ci });
     updatedServices.forEach((s) => servicePromises.push(updateService(s)));
     await Promise.all(servicePromises);
     setFormMultipleCategoryUpdateSubmitting(false);
+    setModalShow(false);
   };
 
   const handleChangeCategoryOfService = (serviceId, newCategory) => {
@@ -165,7 +166,7 @@ const Categories = () => {
       (s) => s.id === serviceId
     );
     if (serviceIndex > -1) {
-      tempUpdatedServices[serviceIndex].c = newCategory;
+      tempUpdatedServices[serviceIndex].ci = newCategory;
       setUpdatedServices(tempUpdatedServices);
     }
   };
@@ -195,7 +196,7 @@ const Categories = () => {
           style={{ width: '100%' }}
           onChange={(value) => handleChangeCategoryOfService(row.id, value)}
           placeholder="Kategori"
-          value={row.c !== '' ? row.c : null}
+          value={row.ci !== '' ? row.ci : null}
           renderMenuItem={(label, item) => {
             return (
               <div>

@@ -96,4 +96,4 @@ app.listen(PORT, function () {
 });
 
 // opens the url in the default browser
-open('http://localhost:5000', {app: {name: 'google chrome'}});
+// open('http://localhost:5000', {app: {name: 'google chrome'}});

@@ -6,7 +6,7 @@ Alert.config({ top: 50 });
 const showError = (content) => Alert.error(content);
 
 const defaultInstance = axios.create();
-
+// defaultInstance.defaults.baseURL = 'http://localhost:6000'
 defaultInstance.interceptors.response.use(
   (response) => {
     return response.data;

@@ -205,6 +205,18 @@ const ServiceDetails = () => {
                   </div>
                 </div>
               </div>
+              <div className="widget-content-wrapper">
+                <div className="widget-content-left">
+                  <div className="widget-subheading">
+                    Servise ait seçtiğin aralıktaki toplam sipariş tutarı
+                  </div>
+                </div>
+                <div className="widget-content-right">
+                  <div className="widget-numbers text-success">
+                    {allOrdersOfService.reduce((total, order) => total + order.e, 0).toFixed(3)}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
