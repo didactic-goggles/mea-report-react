@@ -14,12 +14,14 @@ import {
   IconButton,
   Icon,
   SelectPicker,
+  Alert
 } from 'rsuite';
 import { SocialIcon } from 'react-social-icons';
 // import Card from '../../../UI/Card';
 import BackButton from '../../../UI/BackButton';
 import LoadingIndicator from '../../../UI/LoadingIndicator';
 import categoryTypes from '../../../../constants/categoryTypes';
+import DateRangePicker from '../../../UI/DateRangePicker';
 
 const CategoryDetails = () => {
   console.log('Rendering => CategoryDetails');
@@ -41,6 +43,11 @@ const CategoryDetails = () => {
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [categoryName, setCategoryName] = useState('');
   const [categoryIcon, setCategoryIcon] = useState('');
+  const [selectedDate, setSelectedDate] = useState({
+    startDate: moment().subtract(7, 'days').unix(),
+    endDate: moment().unix(),
+  });
+  const [allServicesAndOrdersOfCategory, setAllServicesAndOrdersOfCategory] = useState([]);
 
   const getCategory = async () => {
     setLoading(true);
@@ -53,6 +60,7 @@ const CategoryDetails = () => {
   // Get Category Details
   useEffect(() => {
     getCategory();
+    getServicesOfCategory();
   }, [categoryId]);
 
   const getServicesOfCategory = async () => {
@@ -62,11 +70,52 @@ const CategoryDetails = () => {
     setAllServicesOfCategory(services.filter((s) => s.ci === categoryId));
     setDetailsLoading(false);
   };
-  // Get Orders Of Service
-  useEffect(() => {
-    getServicesOfCategory();
-  }, [categoryId]);
 
+// Get Orders Of Service
+useEffect(() => {
+  const getOrders = async () => {
+    try {
+      if (!selectedDate.startDate || !selectedDate.endDate) {
+        throw new Error('Geçersiz tarih');
+      }
+      const allOrders = await API.get(
+        `/db/orders?d_gte=${selectedDate.startDate}&d_lte=${selectedDate.endDate}`
+      );
+      if (!allOrders || allOrders.length === 0) {
+        throw new Error('Sipariş bulunamadı');
+      }
+      if (allOrders.length > 0) {
+        const calculatedServices = {};
+        allOrders.forEach((o) => {
+          const serviceIndex = o.s;
+          if (calculatedServices[serviceIndex]) {
+            calculatedServices[serviceIndex].q += 1;
+            calculatedServices[serviceIndex].e += o.e;
+            calculatedServices[serviceIndex].c += o.c;
+          } else {
+            calculatedServices[serviceIndex] = {};
+            calculatedServices[serviceIndex].q = 1;
+            calculatedServices[serviceIndex].e = o.e;
+            calculatedServices[serviceIndex].c = o.c;
+          }
+        });
+        const tempAllServicesOfCategory = [...allServicesOfCategory];
+        Object.keys(calculatedServices).forEach(serviceId => {
+          const categoryService = tempAllServicesOfCategory.find(s => s.id === serviceId)
+          if (categoryService) {
+            categoryService.calculatedData = {
+              ...calculatedServices[serviceId]
+            }
+          }
+        })
+        setAllServicesOfCategory(tempAllServicesOfCategory)
+      }
+    } catch (error) {
+      Alert.error(error.message, 3000);
+    }
+  };
+  getOrders();
+}, [selectedDate]);
   const handleServiceSelectionForDelete = (service) => {
     setSelectedService(service);
     setServiceDeleteConfirmModalShow(true);
@@ -128,6 +177,18 @@ const CategoryDetails = () => {
       },
     },
     {
+      name: 'Toplam Sipariş',
+      selector: 'calculatedData.q',
+      sortable: true,
+      cell: (row) => row.calculatedData ? <span>{row.calculatedData.q}</span> : <div></div>,
+    },
+    {
+      name: 'Toplam Tutar',
+      selector: 'calculatedData.c',
+      sortable: true,
+      cell: (row) => row.calculatedData ? <span>{row.calculatedData.c.round(3)}</span> : <div></div>,
+    },
+    {
       name: '',
       sortable: false,
       maxWidth: '30px',
@@ -141,6 +202,18 @@ const CategoryDetails = () => {
       ),
     },
   ];
+
+  const Filters = () => (
+    <div className="d-flex justify-content-end mb-3">
+      <DateRangePicker
+        selectedDateHandler={setSelectedDate}
+        selectedDate={selectedDate}
+        style={{ width: 230 }}
+        placement="bottomEnd"
+        className="mb-2"
+      />
+    </div>
+  );
 
   if (loading) {
     return <LoadingIndicator />;
@@ -164,6 +237,7 @@ const CategoryDetails = () => {
             Servis Ekle
           </Button>
         </div>
+        <Filters />
         <div className="mb-3">
           <Datatable
             title={`${category.n} Kategorinin Servisleri`}
