@@ -15,11 +15,11 @@ import colors from '../../../../constants/colors';
 
 const UserDetails = (props) => {
   console.log('Rendering => UserDetails');
+  window.showAllSeries = true;
   let { userId } = useParams();
   const [user, setUser] = useState(null);
   const [categories, setCategories] = useState([]);
   const [userOrders, setUserOrders] = useState([]);
-  // const [userPayments, setUserPayments] = useState([]);
   const [userServices, setUserServices] = useState([]);
   const [userFavoriteServise, setUserFavouriteService] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -27,31 +27,27 @@ const UserDetails = (props) => {
     startDate: moment().subtract(7, 'days').unix(),
     endDate: moment().unix(),
   });
-  // const [userTotalSpents, setUserTotalSpents] = useState(0);
   const chartTotalUsages = useRef();
-
+  const [chartUsagesArray, setChartUsagesArray] = useState([]);
+  const [chartSpentsArray, setChartSpentsArray] = useState([]);
+  const [chartCategoriesArray, setChartCategoriesArray] = useState([]);
+  const [series, setSeries] = useState([]);
+  const [dates, setDates] = useState([]);
+  const [showCharts, setShowCharts] = useState(false);
   const getUserDatas = async (userDetails) => {
     try {
-      // console.log(userDetails);
       if (!userDetails) return;
+      setShowCharts(false);
       setLoading(true);
-      const urls = [
-        `/db/orders?u=${userDetails.src}-${userDetails.u}&d_gte=${selectedDate.startDate}&d_lte=${selectedDate.endDate}`,
-        // `/db/payments?u=${userDetails.src}-${userDetails.u}&c_gte=${selectedDate.startDate}&c_lte=${selectedDate.endDate}`,
-      ];
-      var promises = urls.map((url) => API.get(url));
-      const responses = await Promise.all(promises);
-      // console.log(responses);
-      // const getUserOrders = await Axios.get(`/db/orders?user=${user.username}`);
-      // const response = await Promise.all(Axios.get(`/db/orders?user=${user.username}`), Axios.get(`/db/payments?user=${user.username}`));
-      // console.log(response);
+      const url = `/db/orders?u=${userDetails.src}-${userDetails.u}&d_gte=${selectedDate.startDate}&d_lte=${selectedDate.endDate}`;
+      const response = await API.get(url);
       const tempUser = {
         spent: 0,
         quantity: 0,
         services: [],
       };
       const services = [];
-      responses[0].forEach((order) => {
+      response.forEach((order) => {
         tempUser.spent += Number(order.e);
         tempUser.quantity += 1;
         const isExistingServiceInUserSpendings = services.findIndex(
@@ -71,50 +67,97 @@ const UserDetails = (props) => {
           });
         }
       });
-      // console.log(services);
       const servicesPromises = [];
       const getServiceDetails = async (service, i) => {
-        console.log(service);
         const getService = await API.get(`/db/services/${service.id}`);
-        // console.log(getService);
         service.name = getService.n;
         service.color = colors[i];
-        service.c = categories.find(c => c.id === getService.c);
+        service.category = categories.find((c) => c.id === getService.ci);
       };
       services.forEach((service, i) =>
         servicesPromises.push(getServiceDetails(service, i))
       );
       await Promise.all(servicesPromises);
-      // console.log(services);
-      setUserOrders(responses[0]);
+      setUserOrders(response);
       setUserServices(services);
-      // setUser({
-      //   ...user,
-      //   ...tempUser,
-      //   payments: responses[1]
-      // })
     } catch (error) {
       console.log(error);
     }
     setLoading(false);
-    // console.log()
   };
 
-  //   useEffect(() => {
-  //     setLoading(true);
-  //     const getter = async () => {
-  //         await getUserDetails();
-  //         // await getUserPaymentsAndOrders();
-  //         setLoading(false);
-  //     };
-  //     getter();
-  //     console.log(selectedUserDetails)
-  // }, []);
+  const calculateStats = () => {
+    setChartUsagesArray(
+      userServices.sort((service1, service2) =>
+        service1.quantity < service2.quantity ? 1 : -1
+      )
+    );
+
+    setChartSpentsArray(
+      userServices.sort((service1, service2) =>
+        service1.spent < service2.spent ? 1 : -1
+      )
+    );
+
+    setChartCategoriesArray(
+      categories
+        .map((category) => {
+          return {
+            ...category,
+            spent: userServices
+              .filter((s) => s.category.id === category.id)
+              .reduce((sum, b) => sum + b.spent, 0),
+          };
+        })
+        .filter((c) => c.spent > 0)
+    );
+
+    const seriesArray = [];
+    const datesArray = [];
+    userOrders.forEach((order) => {
+      const orderUnixDate = moment(order.d * 1000)
+        .startOf('day')
+        .unix();
+      let orderUnixDateIndex = datesArray.indexOf(orderUnixDate);
+      if (orderUnixDateIndex === -1) {
+        datesArray.push(orderUnixDate);
+        orderUnixDateIndex = datesArray.length - 1;
+      }
+
+      const seriesIndex = seriesArray.findIndex((s) => s.name === order.s);
+      if (seriesIndex === -1) {
+        const seriesObject = {};
+        seriesObject.name = order.s;
+        seriesObject.showCategory = true;
+        seriesObject.data = [];
+        seriesObject.data[orderUnixDateIndex] = 1;
+        seriesArray.push(seriesObject);
+      } else {
+        if (seriesArray[seriesIndex].data[orderUnixDateIndex])
+          seriesArray[seriesIndex].data[orderUnixDateIndex] += 1;
+        else seriesArray[seriesIndex].data[orderUnixDateIndex] = 1;
+      }
+    });
+    seriesArray.forEach((service) => {
+      const userServiceEq = userServices.filter(
+        (s) => s.id === service.name
+      )[0];
+      // console.log(userServiceEq);
+      if (userServiceEq) service.name = userServiceEq.name;
+    });
+    setDates(datesArray);
+    setSeries(seriesArray);
+    setShowCharts(true);
+  };
+
+  useEffect(() => {
+    calculateStats();
+  }, [userOrders, userServices]);
 
   const getCategories = async () => {
     const getCategoriesResponse = await API.get('/db/categories');
     setCategories(getCategoriesResponse);
-  }
+  };
 
   useEffect(() => getCategories(), []);
 
@@ -130,12 +173,6 @@ const UserDetails = (props) => {
         );
         setUserFavouriteService(getServiceDetails);
       }
-      // console.log(selectedUserDetails);
-      // await getUserPaymentsAndOrders(getSelectedUserResponse);
-      // setSelectedDate({
-      //   startDate: moment().subtract(7, "days").unix(),
-      //   endDate: moment().unix(),
-      // });
       setLoading(false);
     };
     getUserDetails();
@@ -147,12 +184,6 @@ const UserDetails = (props) => {
 
   const ChartUsages = () => {
     try {
-      if (!userServices || userServices.length === 0) return;
-
-      const chartUsagesArray = userServices.sort((service1, service2) =>
-        service1.quantity < service2.quantity ? 1 : -1
-      );
-
       var optionsChartUsages = {
         chart: {
           width: 200,
@@ -166,25 +197,8 @@ const UserDetails = (props) => {
           enabled: false,
         },
         colors: chartUsagesArray.map((service) => service.color),
-        //   responsive: [
-        //     {
-        //       breakpoint: 480,
-        //       options: {
-        //         chart: {
-        //           width: "100%",
-        //           height: 350,
-        //         },
-        //         legend: {
-        //           show: false,
-        //         },
-        //       },
-        //     },
-        //   ],
         legend: {
           show: false,
-          // position: 'right',
-          // offsetY: 0,
-          // height: 230,
         },
       };
 
@@ -197,18 +211,12 @@ const UserDetails = (props) => {
         />
       );
     } catch (error) {
-      console.log(error);
-      return;
+      return <div></div>;
     }
   };
+
   const ChartSpents = () => {
     try {
-      if (!userServices || userServices.length === 0) return;
-
-      const chartSpentsArray = userServices.sort((service1, service2) =>
-        service1.spent < service2.spent ? 1 : -1
-      );
-
       var optionsChartSpents = {
         options: {
           chart: {
@@ -238,23 +246,12 @@ const UserDetails = (props) => {
         />
       );
     } catch (error) {
-      return;
+      return <div></div>;
     }
   };
 
   const ChartCategories = () => {
     try {
-      if (!userServices || userServices.length === 0) return;
-
-      const chartCategoriesArray = categories.map((category) => {
-        return {
-          ...category,
-          spent: userServices.filter(s => s.c.id === category.id).reduce((sum, b) => sum + b.spent, 0)
-        }
-      }).filter(c => c.spent > 0);
-
-      console.log(colors.splice(0, chartCategoriesArray.length), chartCategoriesArray)
-
       var optionsChartCategories = {
         options: {
           chart: {
@@ -277,66 +274,44 @@ const UserDetails = (props) => {
 
       return (
         <Chart
-          series={chartCategoriesArray.map((category) => category.spent.round(3))}
+          series={chartCategoriesArray.map((category) =>
+            category.spent.round(3)
+          )}
           options={optionsChartCategories}
           type="donut"
           width="100%"
         />
       );
     } catch (error) {
-      return;
+      return <div></div>;
     }
   };
 
   const ChartTotalUsagesTimeAxis = () => {
-    if (userOrders.length === 0) return null;
-    const series = [];
-    const dates = [];
-    userOrders.forEach((order) => {
-      const orderUnixDate = moment(order.d * 1000)
-        .startOf('day')
-        .unix();
-      let orderUnixDateIndex = dates.indexOf(orderUnixDate);
-      if (orderUnixDateIndex === -1) {
-        dates.push(orderUnixDate);
-        orderUnixDateIndex = dates.length - 1;
-      }
-
-      const seriesIndex = series.findIndex((s) => s.name === order.s);
-      if (seriesIndex === -1) {
-        const seriesObject = {};
-        seriesObject.name = order.s;
-        seriesObject.data = [];
-        seriesObject.data[orderUnixDateIndex] = 1;
-        series.push(seriesObject);
-      } else {
-        if (series[seriesIndex].data[orderUnixDateIndex])
-          series[seriesIndex].data[orderUnixDateIndex] += 1;
-        else series[seriesIndex].data[orderUnixDateIndex] = 1;
-      }
-    });
-    series.forEach((service) => {
-      const userServiceEq = userServices.filter(
-        (s) => s.id === service.name
-      )[0];
-      // console.log(userServiceEq);
-      if (userServiceEq) service.name = userServiceEq.name;
-    });
-
     const options = {
-      series,
+      series: series.filter((s) => s.showCategory),
       options: {
         chart: {
           events: {
             legendClick: function (chartContext, seriesIndex, config) {
-              // series.forEach((s, i) => {
-              //   if (i === seriesIndex) {
-              //     chartContext.showSeries(s.name);
-              //   } else {
-              //     chartContext.hideSeries(s.name);
-              //   }
-              // });
+              const update = chartContext.update;
+              chartContext.update = () => {};
+
+              series.forEach((s, i) => {
+                if (i === seriesIndex) {
+                  chartContext.showSeries(s.name);
+                } else {
+                  chartContext.hideSeries(s.name);
+                }
+              });
               chartContext.showSeries(series[seriesIndex].name);
+
+              chartContext.update = update;
+              chartContext.update();
+
+              // const tempSeries = [...series];
+              // tempSeries[seriesIndex].showCategory = !tempSeries[seriesIndex].showCategory;
+              // setSeries(tempSeries);
             },
           },
           type: 'bar',
@@ -388,16 +363,16 @@ const UserDetails = (props) => {
           enabled: true,
           type: 'x',
           resetIcon: {
-              offsetX: -10,
-              offsetY: 0,
-              fillColor: '#fff',
-              strokeColor: '#37474F'
+            offsetX: -10,
+            offsetY: 0,
+            fillColor: '#fff',
+            strokeColor: '#37474F',
           },
           selection: {
-              background: '#90CAF9',
-              border: '#0D47A1'
-          }    
-      }
+            background: '#90CAF9',
+            border: '#0D47A1',
+          },
+        },
       },
     };
 
@@ -405,17 +380,25 @@ const UserDetails = (props) => {
       <div id="chart-totalUsages">
         <button
           onClick={(e) => {
-            if (e.target.getAttribute('data-toggled') === 'true') {
-              e.target.setAttribute('data-toggled', 'false');
+            const update = chartTotalUsages.current.chart.update;
+            chartTotalUsages.current.chart.update = () => {};
+
+            if (!window.showAllSeries) {
+              window.showAllSeries = true;
               series.forEach((s) => {
                 chartTotalUsages.current.chart.showSeries(s.name);
               });
             } else {
-              e.target.setAttribute('data-toggled', 'true');
+              window.showAllSeries = false;
               series.forEach((s) => {
                 chartTotalUsages.current.chart.hideSeries(s.name);
               });
             }
+
+            chartTotalUsages.current.chart.update = update;
+            chartTotalUsages.current.chart.update();
+
+            // setShowAllSeries(!showAllSeries)
           }}
         >
           Hepsini Gizle/Göster
@@ -464,14 +447,16 @@ const UserDetails = (props) => {
       cell: (row) => {
         return (
           <div>
-            {row.c && row.c.i && <SocialIcon
-              network={row.c.i}
-              className="mr-2"
-              style={{
-                width: 25,
-                height: 25,
-              }}
-            />}
+            {row.c && row.c.i && (
+              <SocialIcon
+                network={row.c.i}
+                className="mr-2"
+                style={{
+                  width: 25,
+                  height: 25,
+                }}
+              />
+            )}
             {(row.c && row.c.n) || 'Tanımlı değil'}
           </div>
         );
@@ -546,14 +531,27 @@ const UserDetails = (props) => {
           </div>
         </div>
       </div>
-      <div className="row mb-3">
-        <div className="col-4">{ChartSpents()}</div>
-        <div className="col-4">{ChartUsages()}</div>
-        <div className="col-4">{ChartCategories()}</div>
-      </div>
-      <div>
-        <ChartTotalUsagesTimeAxis />
-      </div>
+      {showCharts && (
+        <>
+          <div className="row mb-3">
+            <div className="col-4">
+              <ChartSpents />
+            </div>
+            <div className="col-4">
+              <ChartUsages />
+            </div>
+            <div className="col-4">
+              <ChartCategories />
+            </div>
+          </div>
+          <div>
+            <ChartTotalUsagesTimeAxis
+              key={series.filter((s) => s.showCategory).length}
+            />
+          </div>
+        </>
+      )}
+
       <Filters />
       <Datatable
         title="Harcama yaptığı servisler"
