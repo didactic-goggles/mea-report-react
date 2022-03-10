@@ -227,7 +227,7 @@ const Upload = () => {
             searchable={false}
             data={[
               { label: 'Sipariş', value: 'orders' },
-              { label: 'Ödeme', value: 'payments' },
+              // { label: 'Ödeme', value: 'payments' },
             ]}
             onChange={(event) => setFileType(event)}
             block
