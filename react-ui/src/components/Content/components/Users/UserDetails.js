@@ -105,7 +105,7 @@ const UserDetails = (props) => {
           return {
             ...category,
             spent: userServices
-              .filter((s) => s.category.id === category.id)
+              .filter((s) => s.category?.id === category.id)
               .reduce((sum, b) => sum + b.spent, 0),
           };
         })

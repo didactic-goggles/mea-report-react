@@ -49,15 +49,15 @@ const Services = () => {
     },
     {
       name: 'Kategori',
-      selector: 'c',
+      selector: 'ci',
       width: '200px',
       sortable: true,
       cell: (row) => {
         return (
           <div>
-            {row.c && row.c.i && (
+            {row.ci && row.ci.i && (
               <SocialIcon
-                network={row.c.i}
+                network={row.ci.i}
                 className="mr-2"
                 style={{
                   width: 25,
@@ -65,7 +65,7 @@ const Services = () => {
                 }}
               />
             )}
-            {(row.c && row.c.n) || 'Tanımlı değil'}
+            {(row.ci && row.ci.n) || 'Tanımlı değil'}
           </div>
         );
       },
@@ -121,7 +121,7 @@ const Services = () => {
           url += `prv=${provider}&`;
         }
         if (category && category !== '') {
-          url += `c=${category}`;
+          url += `ci=${category}`;
         }
       } else {
         console.log(selectedService);
@@ -131,9 +131,9 @@ const Services = () => {
       console.log(categories);
       getServicesResponse.forEach((service) => {
         const categoryIndex = categoriesArray.findIndex(
-          (c) => c.id === service.c
+          (c) => c.id === service.ci
         );
-        if (categoryIndex > -1) service.c = categoriesArray[categoryIndex];
+        if (categoryIndex > -1) service.ci = categoriesArray[categoryIndex];
       });
       setServices(getServicesResponse);
       const activeReportItem = await API.get(
