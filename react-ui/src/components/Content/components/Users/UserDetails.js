@@ -72,7 +72,7 @@ const UserDetails = (props) => {
         const getService = await API.get(`/db/services/${service.id}`);
         service.name = getService.n;
         service.color = colors[i];
-        service.category = categories.find((c) => c.id === getService.ci);
+        service.ci = categories.find((c) => c.id === getService.ci);
       };
       services.forEach((service, i) =>
         servicesPromises.push(getServiceDetails(service, i))
@@ -102,10 +102,11 @@ const UserDetails = (props) => {
     setChartCategoriesArray(
       categories
         .map((category) => {
+          console.log(userServices);
           return {
             ...category,
             spent: userServices
-              .filter((s) => s.category?.id === category.id)
+              .filter((s) => s.ci?.id === category.id)
               .reduce((sum, b) => sum + b.spent, 0),
           };
         })
