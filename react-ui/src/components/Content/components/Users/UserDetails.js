@@ -441,15 +441,15 @@ const UserDetails = (props) => {
     },
     {
       name: 'Kategori',
-      selector: 'c',
+      selector: 'ci',
       width: '200px',
       sortable: true,
       cell: (row) => {
         return (
           <div>
-            {row.c && row.c.i && (
+            {row.ci && row.ci.i && (
               <SocialIcon
-                network={row.c.i}
+                network={row.ci.i}
                 className="mr-2"
                 style={{
                   width: 25,
@@ -457,7 +457,7 @@ const UserDetails = (props) => {
                 }}
               />
             )}
-            {(row.c && row.c.n) || 'Tanımlı değil'}
+            {(row.ci && row.ci.n) || 'Tanımlı değil'}
           </div>
         );
       },
